@@ -1,6 +1,6 @@
 const db = require('../../config/db');
-// view petitions sorted by the number of signatures descending (highest to lowest)
 
+// View petitions
 exports.getPetitions = async function(q, categoryId, authorId, sortBy){
     const connection = await db.getPool().getConnection();
 
@@ -34,17 +34,22 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy){
         sql += " ORDER BY signatureCount DESC";
     }
 
-    const [rows, fields] = await connection.query(sql);
+    const [rows, _] = await connection.query(sql);
 
     return rows;
 };
 
 
-
-exports.getOne = async function(userId){
+exports.getOne = async function(petitionId){
     const connection = await db.getPool().getConnection();
-    const q = 'SELECT * FROM lab2_users WHERE user_id = ?';
-    const [rows, _] = await connection.query(q, [userId]);
+    const sql = "SELECT Petition.petition_id AS petitionId, title, Category.name AS category, User.name AS authorName, count(*) AS signatureCount, " +
+        "description, User.user_id AS authorId, city AS authorCity, country AS authorCountry, created_date AS createdDate, closing_date AS closingDate " +
+        "FROM Petition, Signature, Category, User " +
+        "WHERE Petition.petition_id = Signature.petition_id AND Petition.category_id = Category.category_id AND Petition.author_id = User.user_id " +
+        "AND Petition.petition_id = " + petitionId +
+        " GROUP BY Petition.petition_id, title, Category.name, User.name";
+
+    const [rows, _] = await connection.query(sql);
     return rows;
 };
 

@@ -1,5 +1,6 @@
 const Petition = require('../models/petition.model');
 
+// View petitions
 exports.list = async function(req, res){
     try {
         let q = req.query.q;
@@ -25,6 +26,8 @@ exports.list = async function(req, res){
     }
 };
 
+
+//TODO Requires authentication
 exports.add = async function(req, res){
     try {
         let user_data = {
@@ -43,15 +46,17 @@ exports.add = async function(req, res){
     }
 };
 
+
+//Retrieve detailed information about a petition
 exports.listInfo = async function(req, res){
     try {
-        const id = +req.params.userId;
-        const result = await User.getOne(id);
+        const id = +req.params.id;
+        const result = await Petition.getOne(id);
         res.status(200)
             .send(result);
     } catch (err) {
         res.status(500)
-            .send(`ERROR fetching user ${err}`);
+            .send(`ERROR fetching petition ${err}`);
     }
 };
 
