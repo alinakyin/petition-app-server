@@ -26,7 +26,7 @@ module.exports = function () {
     // ROUTES
     require('../app/routes/backdoor.routes')(app);
     require('../app/routes/petition.routes')(app);
-    require('../app/routes/user.routes')(app);
+    //require('../app/routes/user.routes')(app);
 
     return app;
 };

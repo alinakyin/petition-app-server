@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-// View petitions
+//View petitions
 exports.getPetitions = async function(q, categoryId, authorId, sortBy){
     const connection = await db.getPool().getConnection();
 
@@ -40,6 +40,18 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy){
 };
 
 
+//TODO post a petition > requires authentication
+exports.insert = async function(username){
+    let values = [username];
+    const connection = await db.getPool().getConnection();
+    const q = 'INSERT INTO lab2_users (username) VALUES ?';
+    const [result, _] = await connection.query(q, values);
+    console.log(`Inserted user with id ${result.insertId}`);
+    return result.insertId;
+};
+
+
+//Retrieve detailed information about a petition
 exports.getOne = async function(petitionId){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT Petition.petition_id AS petitionId, title, Category.name AS category, User.name AS authorName, count(*) AS signatureCount, " +
@@ -53,15 +65,8 @@ exports.getOne = async function(petitionId){
     return rows;
 };
 
-exports.insert = async function(username){
-    let values = [username];
-    const connection = await db.getPool().getConnection();
-    const q = 'INSERT INTO lab2_users (username) VALUES ?';
-    const [result, _] = await connection.query(q, values);
-    console.log(`Inserted user with id ${result.insertId}`);
-    return result.insertId;
-};
 
+//TODO patch a petition > requires authentication
 exports.alter = async function(newName, id){
     const connection = await db.getPool().getConnection();
     const q = 'UPDATE lab2_users SET username = ? WHERE user_id = ?';
@@ -70,8 +75,20 @@ exports.alter = async function(newName, id){
     return result.insertId;
 };
 
+
+//TODO delete a petition > requires authentication
 exports.remove = async function(id){
     const connection = await db.getPool().getConnection();
     const q = 'DELETE FROM lab2_users WHERE user_id = ?';
     await connection.query(q, [id]);
+};
+
+
+//Retrieve all data about petition categories
+exports.getCategories = async function(){
+    const connection = await db.getPool().getConnection();
+    const sql = "SELECT * FROM Category";
+
+    const [rows, _] = await connection.query(sql);
+    return rows;
 };

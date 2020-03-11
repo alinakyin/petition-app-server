@@ -1,6 +1,6 @@
 const Petition = require('../models/petition.model');
 
-// View petitions
+//View petitions
 exports.list = async function(req, res){
     try {
         let q = req.query.q;
@@ -27,7 +27,7 @@ exports.list = async function(req, res){
 };
 
 
-//TODO Requires authentication
+//TODO post a petition > requires authentication
 exports.add = async function(req, res){
     try {
         let user_data = {
@@ -61,6 +61,7 @@ exports.listInfo = async function(req, res){
 };
 
 
+//TODO patch a petition > requires authentication
 exports.changeInfo = async function(req, res){
     try {
         let id = +req.params.userId;
@@ -78,6 +79,8 @@ exports.changeInfo = async function(req, res){
     }
 };
 
+
+//TODO delete a petition > requires authentication
 exports.remove = async function(req, res){
     try {
         let id = +req.params.userId;
@@ -90,16 +93,19 @@ exports.remove = async function(req, res){
     }
 };
 
+
+//Retrieve all data about petition categories
 exports.listCategories = async function(req, res){
     try {
-        const result = await User.getAll();
+        const result = await Petition.getCategories();
         res.status(200)
             .send(result);
     } catch (err) {
         res.status(500)
-            .send(`ERROR getting users ${err}`);
+            .send(`ERROR getting categories ${err}`);
     }
 };
+
 
 exports.showPhoto = async function(req, res){
     try {
