@@ -1,4 +1,5 @@
 const Petition = require('../models/petition.model');
+//TODO add all the error messages
 
 //View petitions
 exports.list = async function(req, res){
@@ -7,12 +8,11 @@ exports.list = async function(req, res){
         let categoryId = req.query.categoryId;
         let authorId = req.query.authorId;
         let sortBy = req.query.sortBy;
+        let startIndex = +req.query.startIndex;
+        let count = +req.query.count;
         const result = await Petition.getPetitions(q, categoryId, authorId, sortBy);
 
-        let startIndex = req.query.startIndex;
-        let count = req.query.count;
-
-        if (startIndex != null && count != null) {
+        if (!(isNaN(startIndex)) && !(isNaN(count))) {
             res.status(200)
                 .send(result.slice(startIndex, startIndex+count));
         } else {
@@ -50,7 +50,7 @@ exports.add = async function(req, res){
 //Retrieve detailed information about a petition
 exports.listInfo = async function(req, res){
     try {
-        const id = +req.params.id;
+        let id = +req.params.id;
         const result = await Petition.getOne(id);
         res.status(200)
             .send(result);
@@ -94,7 +94,7 @@ exports.remove = async function(req, res){
 };
 
 
-//Retrieve all data about petition categories
+//Retrieve all data about petition categories TODO why is it calling listInfo instead of this function
 exports.listCategories = async function(req, res){
     try {
         const result = await Petition.getCategories();
@@ -107,18 +107,26 @@ exports.listCategories = async function(req, res){
 };
 
 
+//Retrieve a petition's hero image
 exports.showPhoto = async function(req, res){
     try {
-        const id = +req.params.userId;
-        const result = await User.getOne(id);
+        let id = +req.params.id;
+        const result = await Petition.getPhoto(id);
+        filename = result[0].photo_filename;
+
+        const fileType = filename.split('.').pop();
+        res.type(fileType);
         res.status(200)
-            .send(result);
+            .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/petition_' + id + '.' + fileType); // TODO probably not a good way to do this
     } catch (err) {
+        console.log(err);
         res.status(500)
-            .send(`ERROR fetching user ${err}`);
+            .send(`ERROR fetching photo ${err}`);
     }
 };
 
+
+//TODO set a petition's photo > requires authentication
 exports.setPhoto = async function(req, res){
     try {
         const id = +req.params.userId;
@@ -131,17 +139,22 @@ exports.setPhoto = async function(req, res){
     }
 };
 
+
+//Retrieve a petition's signatures
 exports.listSignatures = async function(req, res){
     try {
-        const result = await User.getAll();
+        let id = +req.params.id;
+        const result = await Petition.getSignatures(id);
         res.status(200)
             .send(result);
     } catch (err) {
         res.status(500)
-            .send(`ERROR getting users ${err}`);
+            .send(`ERROR getting signatures ${err}`);
     }
 };
 
+
+//TODO sign a petition > requires authentication
 exports.signPetition = async function(req, res){
     try {
         let user_data = {
@@ -160,6 +173,8 @@ exports.signPetition = async function(req, res){
     }
 };
 
+
+//TODO remove signature > requires authentication
 exports.removeSignature = async function(req, res){
     try {
         let id = +req.params.userId;

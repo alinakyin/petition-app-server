@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 
+//Register as a new user
 exports.register = async function(req, res){
     try {
         let user_data = {
@@ -66,7 +67,6 @@ exports.getInfo = async function(req, res){
     }
 };
 
-
 exports.changeInfo = async function(req, res){
     try {
         let id = +req.params.userId;
@@ -107,7 +107,6 @@ exports.getPhoto = async function(req, res){
             .send(`ERROR fetching user ${err}`);
     }
 };
-
 
 exports.removePhoto = async function(req, res){
     try {
