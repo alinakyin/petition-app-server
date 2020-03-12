@@ -4,18 +4,32 @@ const User = require('../models/user.model');
 exports.register = async function(req, res){
     try {
         let user_data = {
-            "username": req.body.username
+            "name": req.body.name,
+            "email": req.body.email,
+            "password": req.body.password,
+            "city": req.body.city,
+            "country": req.body.country
         };
-        let user = user_data['username'].toString();
-        let values = [
-            [user]
-        ];
-        const result = await User.insert(values);
-        res.status(201)
-            .send(`Inserted ${req.body.username} at id ${result}`);
+
+        let name = user_data['name'].toString();
+        let email = user_data['email'].toString();
+        let password = user_data['password'].toString();
+        let city = user_data['city'].toString();
+        let country = user_data['country'].toString();
+
+        if (email.includes("@") && !(await User.emailInUse(email)) && password != (null || "")) {
+            let user_details = [name, email, password, city, country];
+            const result = await User.insert(user_details);
+            res.status(201)
+                .send(result);
+        } else {
+            res.status(400)
+                .send(`Bad request`);
+        }
+
     } catch (err) {
         res.status(500)
-            .send(`ERROR posting user ${err}`);
+            .send(`ERROR registering user ${err}`);
     }
 };
 

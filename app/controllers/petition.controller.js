@@ -12,9 +12,12 @@ exports.list = async function(req, res){
         let count = +req.query.count;
         const result = await Petition.getPetitions(q, categoryId, authorId, sortBy);
 
-        if (!(isNaN(startIndex)) && !(isNaN(count))) {
+        if (!(isNaN(startIndex)) && !(isNaN(count))) { //checking if they exist
             res.status(200)
-                .send(result.slice(startIndex, startIndex+count));
+                .send(result.slice(startIndex, startIndex + count));
+        } else if (!(isNaN(startIndex))) { //if only the startIndex exists
+            res.status(200)
+                .send(result.slice(startIndex))
         } else {
             res.status(200)
                 .send(result);
@@ -112,14 +115,12 @@ exports.showPhoto = async function(req, res){
     try {
         let id = +req.params.id;
         const result = await Petition.getPhoto(id);
-        filename = result[0].photo_filename;
+        var filename = result[0].photo_filename;
 
-        const fileType = filename.split('.').pop();
-        res.type(fileType);
+        //res.type(fileType);
         res.status(200)
-            .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/petition_' + id + '.' + fileType); // TODO probably not a good way to do this
+            .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/' + filename); // TODO probably not a good way to do this
     } catch (err) {
-        console.log(err);
         res.status(500)
             .send(`ERROR fetching photo ${err}`);
     }

@@ -1,5 +1,22 @@
 const db = require('../../config/db');
 
+exports.emailInUse = async function(email){
+    const connection = await db.getPool().getConnection();
+    const sql = "SELECT * FROM User WHERE email = " + email;
+    const [rows, _] = await connection.query(sql);
+    console.log(rows);
+    return rows.length > 0;
+};
+
+exports.insert = async function(user_details){
+    const connection = await db.getPool().getConnection();
+    const sql = "INSERT INTO User (name, email, password, city, country) VALUES (?,?,?,?,?)";
+    const [rows, _] = await connection.query(sql, user_details);
+    console.log(`Inserted user with id ${rows.insertId}`);
+    return rows.insertId;
+};
+
+
 exports.getAll = async function(){
     const connection = await db.getPool().getConnection();
     const q = 'SELECT * FROM lab2_users';
@@ -12,15 +29,6 @@ exports.getOne = async function(userId){
     const q = 'SELECT * FROM lab2_users WHERE user_id = ?';
     const [rows, _] = await connection.query(q, [userId]);
     return rows;
-};
-
-exports.insert = async function(username){
-    let values = [username];
-    const connection = await db.getPool().getConnection();
-    const q = 'INSERT INTO lab2_users (username) VALUES ?';
-    const [result, _] = await connection.query(q, values);
-    console.log(`Inserted user with id ${result.insertId}`);
-    return result.insertId;
 };
 
 exports.alter = async function(newName, id){
