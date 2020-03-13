@@ -10,22 +10,24 @@ exports.list = async function(req, res){
         let sortBy = req.query.sortBy;
         let startIndex = +req.query.startIndex;
         let count = +req.query.count;
-        const result = await Petition.getPetitions(q, categoryId, authorId, sortBy);
-
-        if (!(isNaN(startIndex)) && !(isNaN(count))) { //checking if they exist
-            res.status(200)
-                .send(result.slice(startIndex, startIndex + count));
-        } else if (!(isNaN(startIndex))) { //if only the startIndex exists
-            res.status(200)
-                .send(result.slice(startIndex))
-        } else {
-            res.status(200)
-                .send(result);
-        }
-
+        await Petition.getPetitions(q, categoryId, authorId, sortBy, function(result) {
+            if (result === undefined) {
+                res.sendStatus(500);
+            } else {
+                if (!(isNaN(startIndex)) && !(isNaN(count))) { //checking if they exist
+                    res.status(200)
+                        .json(result.slice(startIndex, startIndex + count));
+                } else if (!(isNaN(startIndex))) { //if only the startIndex exists
+                    res.status(200)
+                        .json(result.slice(startIndex))
+                } else {
+                    res.status(200)
+                        .json(result);
+                }
+            }
+        });
     } catch (err) {
-        res.status(500)
-            .send(`ERROR getting petitions ${err}`);
+        res.sendStatus(400);
     }
 };
 
@@ -51,17 +53,19 @@ exports.add = async function(req, res){
 
 
 //Retrieve detailed information about a petition
-exports.listInfo = async function(req, res){
-    try {
-        let id = +req.params.id;
-        const result = await Petition.getOne(id);
-        res.status(200)
-            .send(result);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR fetching petition ${err}`);
-    }
-};
+exports.listInfo = async function(req, res) {
+    let id = +req.params.id;
+    await Petition.getOne(id, function (result) {
+        if (result === undefined) {
+            res.sendStatus(500);
+        } else if (result === "Not found") {
+            res.sendStatus(404);
+        } else {
+            res.status(200)
+                .json(result);
+        }
+    });
+}
 
 
 //TODO patch a petition > requires authentication
@@ -99,31 +103,31 @@ exports.remove = async function(req, res){
 
 //Retrieve all data about petition categories TODO why is it calling listInfo instead of this function
 exports.listCategories = async function(req, res){
-    try {
-        const result = await Petition.getCategories();
-        res.status(200)
-            .send(result);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR getting categories ${err}`);
-    }
-};
+    await Petition.getCategories(function(result) {
+        if (result === undefined) {
+            res.sendStatus(500);
+        } else {
+            res.status(200)
+                .json(result);
+        }
+    });
+}
 
 
 //Retrieve a petition's hero image
 exports.showPhoto = async function(req, res){
-    try {
-        let id = +req.params.id;
-        const result = await Petition.getPhoto(id);
-        var filename = result[0].photo_filename;
-
-        //res.type(fileType);
-        res.status(200)
-            .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/' + filename); // TODO probably not a good way to do this
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR fetching photo ${err}`);
-    }
+    let id = +req.params.id;
+    await Petition.getPhoto(id, function(result) {
+        if (result === undefined) {
+            res.sendStatus(500);
+        } else if (result === "Not found") {
+            res.sendStatus(404);
+        } else {
+            var filename = result[0].photo_filename;
+            res.status(200)
+                .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/' + filename); // TODO probably not a good way to do this
+        }
+    });
 };
 
 
@@ -143,15 +147,21 @@ exports.setPhoto = async function(req, res){
 
 //Retrieve a petition's signatures
 exports.listSignatures = async function(req, res){
-    try {
-        let id = +req.params.id;
-        const result = await Petition.getSignatures(id);
-        res.status(200)
-            .send(result);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR getting signatures ${err}`);
-    }
+    let id = +req.params.id;
+    await Petition.isValidPetitionId(id, function(isValid) {
+        if (isValid) {
+            Petition.getSignatures(id, function(result) {
+                if (result === undefined) {
+                    res.sendStatus(500);
+                } else {
+                    res.status(200)
+                        .json(result);
+                }
+            });
+        } else {
+            res.sendStatus(404);
+        }
+    });
 };
 
 

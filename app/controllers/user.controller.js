@@ -17,11 +17,11 @@ exports.register = async function(req, res){
         let city = user_data['city'].toString();
         let country = user_data['country'].toString();
 
-        if (email.includes("@") && !(await User.emailInUse(email)) && password != (null || "")) {
+        if (email.includes("@") && !(await User.emailInUse(email)) && password !== (null || "")) {
             let user_details = [name, email, password, city, country];
             const result = await User.insert(user_details);
-            res.status(201)
-                .send(result);
+            res.status(201);
+            res.JSON({userId: result});
         } else {
             res.status(400)
                 .send(`Bad request`);
