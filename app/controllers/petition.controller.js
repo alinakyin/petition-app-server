@@ -1,5 +1,4 @@
 const Petition = require('../models/petition.model');
-//TODO add all the error messages
 
 //View petitions
 exports.list = async function(req, res){
@@ -32,24 +31,24 @@ exports.list = async function(req, res){
 };
 
 
-//TODO post a petition > requires authentication
-exports.add = async function(req, res){
-    try {
-        let user_data = {
-            "username": req.body.username
-        };
-        let user = user_data['username'].toString();
-        let values = [
-            [user]
-        ];
-        const result = await User.insert(values);
-        res.status(201)
-            .send(`Inserted ${req.body.username} at id ${result}`);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR posting user ${err}`);
-    }
-};
+// //TODO post a petition > requires authentication
+// exports.add = async function(req, res){
+//     try {
+//         let user_data = {
+//             "username": req.body.username
+//         };
+//         let user = user_data['username'].toString();
+//         let values = [
+//             [user]
+//         ];
+//         const result = await User.insert(values);
+//         res.status(201)
+//             .send(`Inserted ${req.body.username} at id ${result}`);
+//     } catch (err) {
+//         res.status(500)
+//             .send(`ERROR posting user ${err}`);
+//     }
+// };
 
 
 //Retrieve detailed information about a petition
@@ -65,40 +64,40 @@ exports.listInfo = async function(req, res) {
                 .json(result);
         }
     });
-}
-
-
-//TODO patch a petition > requires authentication
-exports.changeInfo = async function(req, res){
-    try {
-        let id = +req.params.userId;
-        let user_data = {
-            "username": req.body.username
-        };
-        let user = user_data['username'].toString();
-
-        const result = await User.alter(user, id);
-        res.status(201)
-            .send(`Updated user at id ${id}`);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR updating user ${err}`);
-    }
 };
 
 
-//TODO delete a petition > requires authentication
-exports.remove = async function(req, res){
-    try {
-        let id = +req.params.userId;
-        const result = await User.remove(id);
-        res.status(201)
-            .send(`Deleted user with id ${id}`);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR deleting user ${err}`);
-    }
-};
+// //TODO patch a petition > requires authentication
+// exports.changeInfo = async function(req, res){
+//     try {
+//         let id = +req.params.userId;
+//         let user_data = {
+//             "username": req.body.username
+//         };
+//         let user = user_data['username'].toString();
+//
+//         const result = await User.alter(user, id);
+//         res.status(201)
+//             .send(`Updated user at id ${id}`);
+//     } catch (err) {
+//         res.status(500)
+//             .send(`ERROR updating user ${err}`);
+//     }
+// };
+
+
+// //TODO delete a petition > requires authentication
+// exports.remove = async function(req, res){
+//     try {
+//         let id = +req.params.userId;
+//         const result = await User.remove(id);
+//         res.status(201)
+//             .send(`Deleted user with id ${id}`);
+//     } catch (err) {
+//         res.status(500)
+//             .send(`ERROR deleting user ${err}`);
+//     }
+// };
 
 
 //Retrieve all data about petition categories TODO why is it calling listInfo instead of this function
@@ -111,7 +110,7 @@ exports.listCategories = async function(req, res){
                 .json(result);
         }
     });
-}
+};
 
 
 //Retrieve a petition's hero image
@@ -131,18 +130,18 @@ exports.showPhoto = async function(req, res){
 };
 
 
-//TODO set a petition's photo > requires authentication
-exports.setPhoto = async function(req, res){
-    try {
-        const id = +req.params.userId;
-        const result = await User.getOne(id);
-        res.status(200)
-            .send(result);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR fetching user ${err}`);
-    }
-};
+// //TODO set a petition's photo > requires authentication
+// exports.setPhoto = async function(req, res){
+//     try {
+//         const id = +req.params.userId;
+//         const result = await User.getOne(id);
+//         res.status(200)
+//             .send(result);
+//     } catch (err) {
+//         res.status(500)
+//             .send(`ERROR fetching user ${err}`);
+//     }
+// };
 
 
 //Retrieve a petition's signatures
@@ -150,7 +149,7 @@ exports.listSignatures = async function(req, res){
     let id = +req.params.id;
     await Petition.isValidPetitionId(id, function(isValid) {
         if (isValid) {
-            Petition.getSignatures(id, function(result) {
+             Petition.getSignatures(id, function(result) {
                 if (result === undefined) {
                     res.sendStatus(500);
                 } else {
@@ -166,34 +165,34 @@ exports.listSignatures = async function(req, res){
 
 
 //TODO sign a petition > requires authentication
-exports.signPetition = async function(req, res){
-    try {
-        let user_data = {
-            "username": req.body.username
-        };
-        let user = user_data['username'].toString();
-        let values = [
-            [user]
-        ];
-        const result = await User.insert(values);
-        res.status(201)
-            .send(`Inserted ${req.body.username} at id ${result}`);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR posting user ${err}`);
-    }
-};
+// exports.signPetition = async function(req, res){
+//     try {
+//         let user_data = {
+//             "username": req.body.username
+//         };
+//         let user = user_data['username'].toString();
+//         let values = [
+//             [user]
+//         ];
+//         const result = await User.insert(values);
+//         res.status(201)
+//             .send(`Inserted ${req.body.username} at id ${result}`);
+//     } catch (err) {
+//         res.status(500)
+//             .send(`ERROR posting user ${err}`);
+//     }
+// };
 
 
-//TODO remove signature > requires authentication
-exports.removeSignature = async function(req, res){
-    try {
-        let id = +req.params.userId;
-        const result = await User.remove(id);
-        res.status(201)
-            .send(`Deleted user with id ${id}`);
-    } catch (err) {
-        res.status(500)
-            .send(`ERROR deleting user ${err}`);
-    }
-};
+// //TODO remove signature > requires authentication
+// exports.removeSignature = async function(req, res){
+//     try {
+//         let id = +req.params.userId;
+//         const result = await User.remove(id);
+//         res.status(201)
+//             .send(`Deleted user with id ${id}`);
+//     } catch (err) {
+//         res.status(500)
+//             .send(`ERROR deleting user ${err}`);
+//     }
+// };

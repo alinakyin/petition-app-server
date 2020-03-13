@@ -34,7 +34,7 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy, done) { /
         sql += " ORDER BY signatureCount DESC, Petition.petition_id";
     }
 
-    connection.query(sql, function (err, result) {
+    await connection.query(sql, function (err, result) {
         if (err) {
             return done();
         } else {
@@ -44,15 +44,15 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy, done) { /
 };
 
 
-//TODO post a petition > requires authentication
-exports.insert = async function(username){
-    let values = [username];
-    const connection = await db.getPool().getConnection();
-    const q = 'INSERT INTO lab2_users (username) VALUES ?';
-    const [result, _] = await connection.query(q, values);
-    console.log(`Inserted user with id ${result.insertId}`);
-    return result.insertId;
-};
+// //TODO post a petition > requires authentication
+// exports.insert = async function(username){
+//     let values = [username];
+//     const connection = await db.getPool().getConnection();
+//     const q = 'INSERT INTO lab2_users (username) VALUES ?';
+//     const [result, _] = await connection.query(q, values);
+//     console.log(`Inserted user with id ${result.insertId}`);
+//     return result.insertId;
+// };
 
 
 //Retrieve detailed information about a petition
@@ -66,7 +66,7 @@ exports.getOne = async function(petitionId, done){
         "AND Petition.petition_id = " + petitionId +
         " GROUP BY Petition.petition_id, title, Category.name, User.name";
 
-    connection.query(sql, function (err, result) {
+    await connection.query(sql, function (err, result) {
         if (err) {
             // console.log(err);
             return done();
@@ -79,22 +79,22 @@ exports.getOne = async function(petitionId, done){
 };
 
 
-//TODO patch a petition > requires authentication
-exports.alter = async function(newName, id){
-    const connection = await db.getPool().getConnection();
-    const q = 'UPDATE lab2_users SET username = ? WHERE user_id = ?';
-    const [result, _] = await connection.query(q, [newName, id]);
-    console.log(`Updated user with id ${result.insertId}`);
-    return result.insertId;
-};
+// //TODO patch a petition > requires authentication
+// exports.alter = async function(newName, id){
+//     const connection = await db.getPool().getConnection();
+//     const q = 'UPDATE lab2_users SET username = ? WHERE user_id = ?';
+//     const [result, _] = await connection.query(q, [newName, id]);
+//     console.log(`Updated user with id ${result.insertId}`);
+//     return result.insertId;
+// };
 
 
-//TODO delete a petition > requires authentication
-exports.remove = async function(id){
-    const connection = await db.getPool().getConnection();
-    const q = 'DELETE FROM lab2_users WHERE user_id = ?';
-    await connection.query(q, [id]);
-};
+// //TODO delete a petition > requires authentication
+// exports.remove = async function(id){
+//     const connection = await db.getPool().getConnection();
+//     const q = 'DELETE FROM lab2_users WHERE user_id = ?';
+//     await connection.query(q, [id]);
+// };
 
 
 //Retrieve all data about petition categories
@@ -102,7 +102,7 @@ exports.getCategories = async function(done){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT * FROM Category";
 
-    connection.query(sql, function(err, result) {
+    await connection.query(sql, function(err, result) {
         if (err) {
             return done();
         } else {
@@ -117,7 +117,7 @@ exports.getPhoto = async function(petitionId, done){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
 
-    connection.query(sql, function(err, result) {
+    await connection.query(sql, function(err, result) {
         if (err) {
             return done();
         } else if (result.length === 0) {
@@ -136,7 +136,7 @@ exports.getSignatures = async function(petitionId, done){
         "FROM Petition, Signature, User WHERE Petition.petition_id = Signature.petition_id AND Signature.signatory_id = User.user_id AND " +
         "Petition.petition_id = " + petitionId + " ORDER BY signed_date ASC";
 
-    connection.query(sql, function(err, result) {
+    await connection.query(sql, function(err, result) {
         if (err) {
             return done();
         } else {
@@ -145,11 +145,11 @@ exports.getSignatures = async function(petitionId, done){
     });
 };
 
-//Checks if the petition exists
+//Checks that petition exists
 exports.isValidPetitionId = async function(petitionId, done) {
     const connection = await db.getPool().getConnection();
     const sql = "SELECT * FROM Petition WHERE petition_id = " + petitionId;
-    connection.query(sql, function(err, result) {
+    await connection.query(sql, function(err, result) {
         if (err || result.length !== 1) {
             return done();
         } else {
