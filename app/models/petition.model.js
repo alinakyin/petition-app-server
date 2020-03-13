@@ -34,7 +34,7 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy, done) { /
         sql += " ORDER BY signatureCount DESC, Petition.petition_id";
     }
 
-    await connection.query(sql, function (err, result) {
+    connection.query(sql, function (err, result) {
         if (err) {
             return done();
         } else {
@@ -66,7 +66,7 @@ exports.getOne = async function(petitionId, done){
         "AND Petition.petition_id = " + petitionId +
         " GROUP BY Petition.petition_id, title, Category.name, User.name";
 
-    await connection.query(sql, function (err, result) {
+    connection.query(sql, function (err, result) {
         if (err) {
             // console.log(err);
             return done();
@@ -102,7 +102,7 @@ exports.getCategories = async function(done){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT * FROM Category";
 
-    await connection.query(sql, function(err, result) {
+    connection.query(sql, function(err, result) {
         if (err) {
             return done();
         } else {
@@ -117,7 +117,7 @@ exports.getPhoto = async function(petitionId, done){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
 
-    await connection.query(sql, function(err, result) {
+    connection.query(sql, function(err, result) {
         if (err) {
             return done();
         } else if (result.length === 0) {
@@ -136,7 +136,7 @@ exports.getSignatures = async function(petitionId, done){
         "FROM Petition, Signature, User WHERE Petition.petition_id = Signature.petition_id AND Signature.signatory_id = User.user_id AND " +
         "Petition.petition_id = " + petitionId + " ORDER BY signed_date ASC";
 
-    await connection.query(sql, function(err, result) {
+    connection.query(sql, function(err, result) {
         if (err) {
             return done();
         } else {
@@ -149,7 +149,7 @@ exports.getSignatures = async function(petitionId, done){
 exports.isValidPetitionId = async function(petitionId, done) {
     const connection = await db.getPool().getConnection();
     const sql = "SELECT * FROM Petition WHERE petition_id = " + petitionId;
-    await connection.query(sql, function(err, result) {
+    connection.query(sql, function(err, result) {
         if (err || result.length !== 1) {
             return done();
         } else {
