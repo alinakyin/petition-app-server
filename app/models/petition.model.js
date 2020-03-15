@@ -69,10 +69,13 @@ exports.getOne = async function(petitionId, done){
     await connection.query(sql, function (err, result) {
         if (err) {
             // console.log(err);
+            connection.release();
             return done();
         } else if (result.length === 0) {
+            connection.release();
             return done("Not found");
         } else {
+            connection.release();
             return done(result);
         }
     });
@@ -104,8 +107,10 @@ exports.getCategories = async function(done){
 
     await connection.query(sql, function(err, result) {
         if (err) {
+            connection.release();
             return done();
         } else {
+            connection.release();
             return done(result);
         }
     });
@@ -119,10 +124,13 @@ exports.getPhoto = async function(petitionId, done){
 
     await connection.query(sql, function(err, result) {
         if (err) {
+            connection.release();
             return done();
         } else if (result.length === 0) {
+            connection.release();
             return done("Not found");
         } else {
+            connection.release();
             return done(result);
         }
     });
@@ -138,8 +146,10 @@ exports.getSignatures = async function(petitionId, done){
 
     await connection.query(sql, function(err, result) {
         if (err) {
+            connection.release();
             return done();
         } else {
+            connection.release();
             return done(result);
         }
     });
@@ -151,8 +161,10 @@ exports.isValidPetitionId = async function(petitionId, done) {
     const sql = "SELECT * FROM Petition WHERE petition_id = " + petitionId;
     await connection.query(sql, function(err, result) {
         if (err || result.length !== 1) {
+            connection.release();
             return done();
         } else {
+            connection.release();
             return done(true)
         }
     });
