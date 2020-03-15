@@ -100,7 +100,7 @@ exports.listInfo = async function(req, res) {
 // };
 
 
-//Retrieve all data about petition categories TODO why is it calling listInfo instead of this function
+//Retrieve all data about petition categories
 exports.listCategories = async function(req, res){
     await Petition.getCategories(function(result) {
         if (result === undefined) {
@@ -148,8 +148,10 @@ exports.showPhoto = async function(req, res){
 exports.listSignatures = async function(req, res){
     let id = +req.params.id;
     await Petition.isValidPetitionId(id, function(isValid) {
-        if (isValid) {
-             Petition.getSignatures(id, function(result) {
+        if (!(isValid)) {
+            res.sendStatus(404);
+        } else {
+            Petition.getSignatures(id, function(result) {
                 if (result === undefined) {
                     res.sendStatus(500);
                 } else {
@@ -157,8 +159,6 @@ exports.listSignatures = async function(req, res){
                         .json(result);
                 }
             });
-        } else {
-            res.sendStatus(404);
         }
     });
 };

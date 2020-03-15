@@ -5,13 +5,13 @@ module.exports = function(app) {
         .get(petitions.list);
         //.post(petitions.add);
 
+    app.route(app.rootUrl + '/petitions/categories')
+        .get(petitions.listCategories);
+
     app.route(app.rootUrl + '/petitions/:id')
         .get(petitions.listInfo);
         //.patch(petitions.changeInfo)
         //.delete(petitions.remove);
-
-    app.route(app.rootUrl + '/petitions/categories')
-        .get(petitions.listCategories);
 
     app.route(app.rootUrl + '/petitions/:id/photo')
         .get(petitions.showPhoto);
