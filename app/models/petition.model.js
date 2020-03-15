@@ -36,8 +36,10 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy, done) { /
 
     await connection.query(sql, function (err, result) {
         if (err) {
+            connection.release();
             return done();
         } else {
+            connection.release();
             return done(result);
         }
     });
