@@ -11,6 +11,16 @@ exports.emailAvailable = async function(email){
     }
 };
 
+exports.emailAvailable = async function(email){
+    const connection = await db.getPool().getConnection();
+    const sql = "SELECT count(*) AS count FROM User WHERE email = " + "'" + email + "'";
+    const [result, _] = await connection.query(sql);
+    if (result[0].count === 0) {
+        connection.release();
+        return true
+    }
+};
+
 exports.insert = async function(user_details){
     try {
         const connection = await db.getPool().getConnection();

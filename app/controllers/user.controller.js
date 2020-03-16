@@ -57,7 +57,7 @@ exports.login = async function(req, res){
         // generate token, insert token into database, send back userId associated with the email and the token generated
         const id = await User.getUserByEmail(email);
         if (id === -1) {
-            res.sendStatus(500);
+            res.sendStatus(400);
         } else {
             const newToken = await User.insertToken(id);
             if (newToken === -1) {
