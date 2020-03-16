@@ -43,7 +43,7 @@ exports.register = async function(req, res){
     }
 };
 
-//Log in as an existing user
+//Log in as an existing user (changed 500 to 400?)
 exports.login = async function(req, res){
     try {
         let user_data = {
@@ -61,7 +61,7 @@ exports.login = async function(req, res){
         } else {
             const newToken = await User.insertToken(id);
             if (newToken === -1) {
-                res.sendStatus(500);
+                res.sendStatus(400);
             } else {
                 res.status(200)
                     .send({userId: id, token: newToken});
@@ -72,57 +72,117 @@ exports.login = async function(req, res){
     }
 };
 
-// req.get('X-Authorization');
-
-/*
+//Log out the currently authorised user
 exports.logout = async function(req, res){
     try {
-        let user_data = {
-            "username": req.body.username
-        };
-        let user = user_data['username'].toString();
-        let values = [
-            [user]
-        ];
-        const result = await User.insert(values);
-        res.status(201)
-            .send(`Inserted ${req.body.username} at id ${result}`);
+        let currToken = req.get('X-Authorization');
+        const exists = await User.tokenExists(currToken);
+        if (!(exists)) {
+            res.sendStatus(401);
+        } else {
+            await User.deleteToken(currToken);
+            res.sendStatus(200);
+        }
     } catch (err) {
-        res.status(500)
-            .send(`ERROR posting user ${err}`);
+        res.sendStatus(500);
     }
 };
 
-
+//Retrieve information about a user
 exports.getInfo = async function(req, res){
     try {
-        const id = +req.params.userId;
-        const result = await User.getOne(id);
-        res.status(200)
-            .send(result);
+        const id = +req.params.id;
+        let currToken = req.get('X-Authorization');
+        const [name, city, country, email] = await User.getSomeDetails(id);
+
+        // Compare currToken with auth_token of user with that id, if same show email, if not only name, city and country
+        const userToken = await User.getToken(id);
+
+        if (currToken === userToken) {
+            res.status(200)
+                .send({name: name, city: city, country: country, email: email});
+        } else {
+            res.status(200)
+                .send({name: name, city: city, country: country});
+        }
+
     } catch (err) {
-        res.status(500)
-            .send(`ERROR fetching user ${err}`);
+        res.sendStatus(404);
     }
 };
 
-exports.changeInfo = async function(req, res){
+//Change a user's details
+exports.changeInfo = async function(req, res) {
     try {
-        let id = +req.params.userId;
-        let user_data = {
-            "username": req.body.username
-        };
-        let user = user_data['username'].toString();
+        const id = +req.params.id;
+        let currToken = req.get('X-Authorization'); // the user making the patch
+        const userToken = await User.getToken(id); // the one you're patching
 
-        const result = await User.alter(user, id);
-        res.status(201)
-            .send(`Updated user at id ${id}`);
+        if (currToken !== userToken) {
+            res.sendStatus(401);
+        }
+
+        const [ogName, ogEmail, ogPassword, ogCity, ogCountry] = await User.getDetails(id);
+
+        try {
+            const currentPassword = req.body.currentPassword.toString();
+            if (!(currentPassword === ogPassword)) {
+                res.sendStatus(403);
+            }
+        } catch (err) {
+            res.sendStatus(400);
+        }
+
+        var isSame = true;
+        if (req.body.name) {
+            const name = req.body.name.toString();
+            if (name !== ogName) {
+                isSame = false;
+                await User.updateName(id, name);
+            }
+        } else if (req.body.email) {
+            const email = req.body.email.toString();
+            const isAvailable = await User.emailAvailable(email);
+            if (!(isAvailable) || !(email.includes("@"))) {
+                res.sendStatus(400);
+            } else {
+                if (email !== ogEmail) {
+                    isSame = false;
+                    await User.updateEmail(id, email);
+                }
+            }
+        } else if (req.body.password) {
+            const password = req.body.password.toString();
+            if (password !== ogPassword) {
+                isSame = false;
+                await User.updatePassword(id, password);
+            }
+        } else if (req.body.city) {
+            const city = req.body.city.toString();
+            if (city !== ogCity) {
+                isSame = false;
+                await User.updateCity(id, city);
+            }
+        } else if (req.body.country) {
+            const country = req.body.country.toString();
+            if (country !== ogCountry) {
+                isSame = false;
+                await User.updateCountry(id, country);
+            }
+        }
+
+        if (isSame) {
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(200);
+        }
+
     } catch (err) {
-        res.status(500)
-            .send(`ERROR updating user ${err}`);
+        res.sendStatus(500);
     }
 };
 
+/*
 exports.setPhoto = async function(req, res){
     try {
         const id = +req.params.userId;
