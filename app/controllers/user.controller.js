@@ -14,43 +14,67 @@ exports.register = async function(req, res){
         let name = user_data['name'].toString();
         let email = user_data['email'].toString();
         let password = user_data['password'].toString();
-        let city = user_data['city'].toString();
-        let country = user_data['country'].toString();
 
-        if (email.includes("@") && !(await User.emailInUse(email)) && password !== (null || "")) {
-            let user_details = [name, email, password, city, country];
-            const result = await User.insert(user_details);
-            res.status(201);
-            res.JSON({userId: result});
+        let city = user_data['city'];
+        if (city != null) {
+            city.toString();
+        }
+        let country = user_data['country'];
+        if (country != null) {
+            country.toString();
+        }
+
+        const isAvailable = await User.emailAvailable(email);
+        if (!(isAvailable) || !(email.includes("@")) || password === "" || password === undefined) {
+            res.sendStatus(400);
         } else {
-            res.status(400)
-                .send(`Bad request`);
+            let user_details = [name, email, password, city, country];
+            let insertId = await User.insert(user_details);
+            if (insertId === -1) {
+                res.sendStatus(400);
+            } else {
+                res.status(201)
+                    .send({userId: insertId});
+            }
         }
 
     } catch (err) {
-        res.status(500)
-            .send(`ERROR registering user ${err}`);
+        res.sendStatus(400);
     }
 };
 
+//Log in as an existing user
 exports.login = async function(req, res){
     try {
         let user_data = {
-            "username": req.body.username
+            "email": req.body.email,
+            "password": req.body.password
         };
-        let user = user_data['username'].toString();
-        let values = [
-            [user]
-        ];
-        const result = await User.insert(values);
-        res.status(201)
-            .send(`Inserted ${req.body.username} at id ${result}`);
+
+        let email = user_data['email'].toString();
+        let password = user_data['password'].toString();
+
+        // generate token, insert token into database, send back userId associated with the email and the token generated
+        const id = await User.getUserByEmail(email);
+        if (id === -1) {
+            res.sendStatus(500);
+        } else {
+            const newToken = await User.insertToken(id);
+            if (newToken === -1) {
+                res.sendStatus(500);
+            } else {
+                res.status(200)
+                    .send({userId: id, token: newToken});
+            }
+        }
     } catch (err) {
-        res.status(500)
-            .send(`ERROR posting user ${err}`);
+        res.sendStatus(400);
     }
 };
 
+// req.get('X-Authorization');
+
+/*
 exports.logout = async function(req, res){
     try {
         let user_data = {
@@ -68,6 +92,7 @@ exports.logout = async function(req, res){
             .send(`ERROR posting user ${err}`);
     }
 };
+
 
 exports.getInfo = async function(req, res){
     try {
@@ -133,3 +158,6 @@ exports.removePhoto = async function(req, res){
             .send(`ERROR deleting user ${err}`);
     }
 };
+
+
+ */

@@ -7,7 +7,7 @@ module.exports = function(app) {
     app.route(app.rootUrl + '/users/login')
         .post(users.login);
 
-    app.route(app.rootUrl + '/users/logout')
+    /*app.route(app.rootUrl + '/users/logout')
         .post(users.logout);
 
     app.route(app.rootUrl + '/users/:id')
@@ -20,4 +20,6 @@ module.exports = function(app) {
         .get(users.getPhoto)
         .put(users.setPhoto)
         .delete(users.removePhoto);
+
+     */
 };
