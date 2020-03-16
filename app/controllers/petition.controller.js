@@ -9,24 +9,24 @@ exports.list = async function(req, res){
         let sortBy = req.query.sortBy;
         let startIndex = +req.query.startIndex;
         let count = +req.query.count;
-        await Petition.getPetitions(q, categoryId, authorId, sortBy, function(result) {
-            if (result === undefined) {
-                res.sendStatus(500);
+        const results = await Petition.getPetitions(q, categoryId, authorId, sortBy);
+        if (results === -1) {
+            res.sendStatus(500);
+        } else {
+            if (!(isNaN(startIndex)) && !(isNaN(count))) { //checking if they exist
+                res.status(200)
+                    .send(results.slice(startIndex, startIndex + count));
+            } else if (!(isNaN(startIndex))) { //if only the startIndex exists
+                res.status(200)
+                    .send(results.slice(startIndex))
             } else {
-                if (!(isNaN(startIndex)) && !(isNaN(count))) { //checking if they exist
-                    res.status(200)
-                        .json(result.slice(startIndex, startIndex + count));
-                } else if (!(isNaN(startIndex))) { //if only the startIndex exists
-                    res.status(200)
-                        .json(result.slice(startIndex))
-                } else {
-                    res.status(200)
-                        .json(result);
-                }
+                res.status(200)
+                    .send(results);
             }
-        });
+        }
+
     } catch (err) {
-        res.sendStatus(400);
+        res.sendStatus(500);
     }
 };
 
@@ -53,17 +53,23 @@ exports.list = async function(req, res){
 
 //Retrieve detailed information about a petition
 exports.listInfo = async function(req, res) {
-    let id = +req.params.id;
-    await Petition.getOne(id, function (result) {
-        if (result === undefined) {
-            res.sendStatus(500);
-        } else if (result === "Not found") {
+    try {
+        let id = +req.params.id;
+        const isValidId = await Petition.isValidPetitionId(id);
+        if (!(isValidId)) {
             res.sendStatus(404);
         } else {
-            res.status(200)
-                .json(result);
+            const results = await Petition.getOne(id);
+            if (results === -1) {
+                res.sendStatus(500);
+            } else {
+                res.status(200)
+                    .send(results);
+            }
         }
-    });
+    } catch (err) {
+        res.sendStatus(500);
+    }
 };
 
 
@@ -102,14 +108,17 @@ exports.listInfo = async function(req, res) {
 
 //Retrieve all data about petition categories
 exports.listCategories = async function(req, res){
-    await Petition.getCategories(function(result) {
-        if (result === undefined) {
+    try {
+        const results = await Petition.getCategories();
+        if (results === -1) {
             res.sendStatus(500);
         } else {
             res.status(200)
-                .json(result);
+                .send(results);
         }
-    });
+    } catch (err) {
+        res.sendStatus(500);
+    }
 };
 
 
@@ -146,21 +155,23 @@ exports.showPhoto = async function(req, res){
 
 //Retrieve a petition's signatures
 exports.listSignatures = async function(req, res){
-    let id = +req.params.id;
-    await Petition.isValidPetitionId(id, function(isValid) {
-        if (!(isValid)) {
+    try {
+        let id = +req.params.id;
+        const isValidId = await Petition.isValidPetitionId(id);
+        if (!(isValidId)) {
             res.sendStatus(404);
         } else {
-            Petition.getSignatures(id, function(result) {
-                if (result === undefined) {
-                    res.sendStatus(500);
-                } else {
-                    res.status(200)
-                        .json(result);
-                }
-            });
+            const results = await Petition.getSignatures(id);
+            if (results === -1) {
+                res.sendStatus(500);
+            } else {
+                res.status(200)
+                    .send(results);
+            }
         }
-    });
+    } catch (err) {
+        res.sendStatus(500);
+    }
 };
 
 
