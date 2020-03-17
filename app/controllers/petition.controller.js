@@ -12,22 +12,22 @@ exports.list = async function(req, res){
         let count = +req.query.count;
         const results = await Petition.getPetitions(q, categoryId, authorId, sortBy);
         if (results === -1) {
-            res.sendStatus(500);
+            return res.sendStatus(500);
         } else {
             if (!(isNaN(startIndex)) && !(isNaN(count))) { //checking if they exist
-                res.status(200)
+                return res.status(200)
                     .send(results.slice(startIndex, startIndex + count));
             } else if (!(isNaN(startIndex))) { //if only the startIndex exists
-                res.status(200)
+                return res.status(200)
                     .send(results.slice(startIndex))
             } else {
-                res.status(200)
+                return res.status(200)
                     .send(results);
             }
         }
 
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
@@ -58,18 +58,18 @@ exports.listInfo = async function(req, res) {
         let id = +req.params.id;
         const isValidId = await Petition.isValidPetitionId(id);
         if (!(isValidId)) {
-            res.sendStatus(404);
+            return res.sendStatus(404);
         } else {
             const results = await Petition.getOne(id);
             if (results === -1) {
-                res.sendStatus(500);
+                return res.sendStatus(500);
             } else {
-                res.status(200)
+                return res.status(200)
                     .send(results);
             }
         }
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
@@ -112,13 +112,13 @@ exports.listCategories = async function(req, res){
     try {
         const results = await Petition.getCategories();
         if (results === -1) {
-            res.sendStatus(500);
+            return res.sendStatus(500);
         } else {
-            res.status(200)
+            return res.status(200)
                 .send(results);
         }
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
@@ -189,18 +189,18 @@ exports.listSignatures = async function(req, res){
         let id = +req.params.id;
         const isValidId = await Petition.isValidPetitionId(id);
         if (!(isValidId)) {
-            res.sendStatus(404);
+            return res.sendStatus(404);
         } else {
             const results = await Petition.getSignatures(id);
             if (results === -1) {
-                res.sendStatus(500);
+                return res.sendStatus(500);
             } else {
-                res.status(200)
+                return res.status(200)
                     .send(results);
             }
         }
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 

@@ -26,20 +26,20 @@ exports.register = async function(req, res){
 
         const isAvailable = await User.emailAvailable(email);
         if (!(isAvailable) || !(email.includes("@")) || password === "" || password === undefined) {
-            res.sendStatus(400);
+            return res.sendStatus(400);
         } else {
             let user_details = [name, email, password, city, country];
             let insertId = await User.insert(user_details);
             if (insertId === -1) {
-                res.sendStatus(400);
+                return res.sendStatus(400);
             } else {
-                res.status(201)
+                return res.status(201)
                     .send({userId: insertId});
             }
         }
 
     } catch (err) {
-        res.sendStatus(400);
+        return res.sendStatus(400);
     }
 };
 
@@ -57,18 +57,18 @@ exports.login = async function(req, res){
         // generate token, insert token into database, send back userId associated with the email and the token generated
         const id = await User.getUserByEmail(email);
         if (id === -1) {
-            res.sendStatus(400);
+            return res.sendStatus(400);
         } else {
             const newToken = await User.insertToken(id);
             if (newToken === -1) {
-                res.sendStatus(400);
+                return res.sendStatus(400);
             } else {
-                res.status(200)
+                return res.status(200)
                     .send({userId: id, token: newToken});
             }
         }
     } catch (err) {
-        res.sendStatus(400);
+        return res.sendStatus(400);
     }
 };
 
@@ -78,13 +78,13 @@ exports.logout = async function(req, res){
         let currToken = req.get('X-Authorization');
         const exists = await User.tokenExists(currToken);
         if (!(exists)) {
-            res.sendStatus(401);
+            return res.sendStatus(401);
         } else {
             await User.deleteToken(currToken);
-            res.sendStatus(200);
+            return res.sendStatus(200);
         }
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
@@ -99,15 +99,15 @@ exports.getInfo = async function(req, res){
         const userToken = await User.getToken(id);
 
         if (currToken === userToken) {
-            res.status(200)
+            return res.status(200)
                 .send({name: name, city: city, country: country, email: email});
         } else {
-            res.status(200)
+            return res.status(200)
                 .send({name: name, city: city, country: country});
         }
 
     } catch (err) {
-        res.sendStatus(404);
+        return res.sendStatus(404);
     }
 };
 
@@ -119,7 +119,7 @@ exports.changeInfo = async function(req, res) {
         const userToken = await User.getToken(id); // the one you're patching
 
         if (currToken !== userToken) {
-            res.sendStatus(401);
+            return res.sendStatus(401);
         }
 
         const [ogName, ogEmail, ogPassword, ogCity, ogCountry] = await User.getDetails(id);
@@ -127,10 +127,10 @@ exports.changeInfo = async function(req, res) {
         try {
             const currentPassword = req.body.currentPassword.toString();
             if (!(currentPassword === ogPassword)) {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (err) {
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
 
         var isSame = true;
@@ -172,13 +172,13 @@ exports.changeInfo = async function(req, res) {
         }
 
         if (isSame) {
-            res.sendStatus(400);
+            return res.sendStatus(400);
         } else {
-            res.sendStatus(200);
+            return res.sendStatus(200);
         }
 
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
