@@ -45,15 +45,34 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy) {
 };
 
 
-// //TODO post a petition > requires authentication
-// exports.insert = async function(username){
-//     let values = [username];
-//     const connection = await db.getPool().getConnection();
-//     const q = 'INSERT INTO lab2_users (username) VALUES ?';
-//     const [result, _] = await connection.query(q, values);
-//     console.log(`Inserted user with id ${result.insertId}`);
-//     return result.insertId;
-// };
+//Inserts a new petition
+exports.insert = async function(petition_details){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "INSERT INTO Petition (title, description, author_id, category_id, created_date, closing_date) VALUES (?,?,?,?,?,?)";
+        let [result, _] = await connection.query(sql, petition_details);
+        connection.release();
+        return result.insertId;
+    } catch {
+        return -1;
+    }
+};
+
+
+//Checks that a category exists
+exports.categoryExists = async function(categoryId) {
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT count(*) AS count FROM Category WHERE category_id = " + categoryId;
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        if (results[0].count === 1) {
+            return true
+        }
+    } catch {
+        return -1;
+    }
+};
 
 
 //Retrieve detailed information about a petition
@@ -77,23 +96,97 @@ exports.getOne = async function(petitionId){
 };
 
 
-// //TODO patch a petition > requires authentication
-// exports.alter = async function(newName, id){
-//     const connection = await db.getPool().getConnection();
-//     const q = 'UPDATE lab2_users SET username = ? WHERE user_id = ?';
-//     const [result, _] = await connection.query(q, [newName, id]);
-//     console.log(`Updated user with id ${result.insertId}`);
-//     return result.insertId;
-// };
+//Get all petition details associated with the id
+exports.getDetails = async function(id){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT title, description, category_id, closing_date FROM Petition WHERE petition_id = " + id;
+        const [row, _] = await connection.query(sql);
+        connection.release();
+        const title = row[0].title;
+        const description = row[0].description;
+        const categoryId = row[0].category_id;
+        const closingDate = row[0].closing_date
+        return [title, description, categoryId, closingDate];
+    } catch {
+        return -1;
+    }
+};
 
 
-// //TODO delete a petition > requires authentication
-// exports.remove = async function(id){
-//     const connection = await db.getPool().getConnection();
-//     const q = 'DELETE FROM lab2_users WHERE user_id = ?';
-//     await connection.query(q, [id]);
-// };
+//Update title
+exports.updateTitle = async function(id, title){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "UPDATE Petition SET title = ? WHERE petition_id = " + id;
+        await connection.query(sql, [title]);
+        connection.release();
+    } catch {
+        return -1;
+    }
+};
 
+
+//Update description
+exports.updateDescription = async function(id, description){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "UPDATE Petition SET description = ? WHERE petition_id = " + id;
+        await connection.query(sql, [description]);
+        connection.release();
+    } catch {
+        return -1;
+    }
+};
+
+
+//Update categoryId
+exports.updateCategoryId = async function(id, categoryId){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "UPDATE Petition SET category_id = ? WHERE petition_id = " + id;
+        await connection.query(sql, [categoryId]);
+        connection.release();
+    } catch {
+        return -1;
+    }
+};
+
+
+//Update closingDate
+exports.updateClosingDate = async function(id, closingDate){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "UPDATE Petition SET closing_date = ? WHERE petition_id = " + id;
+        await connection.query(sql, [closingDate]);
+        connection.release();
+    } catch {
+        return -1;
+    }
+};
+
+
+//Delete a petition
+exports.remove = async function(id){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = 'DELETE FROM Petition WHERE petition_id = ?';
+        await connection.query(sql, [id]);
+    } catch {
+        return -1;
+    }
+};
+
+//Delete a petition's signatures
+exports.removeAll = async function(id){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = 'DELETE FROM Signature WHERE petition_id = ?';
+        await connection.query(sql, [id]);
+    } catch {
+        return -1;
+    }
+};
 
 //Retrieve all data about petition categories
 exports.getCategories = async function(){
@@ -167,6 +260,48 @@ exports.getSignatures = async function(petitionId){
         const [results, _] = await connection.query(sql);
         connection.release();
         return results;
+    } catch {
+        return -1;
+    }
+};
+
+
+//Checks if a petition has closed
+exports.hasClosed = async function(petitionId, currentDate) {
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT closing_date FROM Petition WHERE petition_id = " + petitionId;
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        if (results[0].closing_date < currentDate) {
+            return true
+        }
+    } catch {
+        return -1;
+    }
+};
+
+
+//Inserts a new petition
+exports.addSignature = async function(signature_details){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "INSERT INTO Signature (signatory_id, petition_id, signed_date) VALUES (?,?,?)";
+        await connection.query(sql, signature_details);
+        connection.release();
+
+    } catch {
+        return -1;
+    }
+};
+
+
+//Delete one signature from a petition
+exports.removeOne = async function(userId, petitionId){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = 'DELETE FROM Signature WHERE signatory_id = ? AND petition_id = ?';
+        await connection.query(sql, [userId, petitionId]);
     } catch {
         return -1;
     }

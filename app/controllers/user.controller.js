@@ -77,7 +77,7 @@ exports.logout = async function(req, res){
     try {
         let currToken = req.get('X-Authorization');
         const exists = await User.tokenExists(currToken);
-        if (!(exists)) {
+        if (!(exists) || currToken === undefined) {
             return res.sendStatus(401);
         } else {
             await User.deleteToken(currToken);
@@ -134,13 +134,7 @@ exports.changeInfo = async function(req, res) {
         }
 
         var isSame = true;
-        if (req.body.name) {
-            const name = req.body.name.toString();
-            if (name !== ogName) {
-                isSame = false;
-                await User.updateName(id, name);
-            }
-        } else if (req.body.email) {
+        if (req.body.email) {
             const email = req.body.email.toString();
             const isAvailable = await User.emailAvailable(email);
             if (!(isAvailable) || !(email.includes("@"))) {
@@ -151,19 +145,33 @@ exports.changeInfo = async function(req, res) {
                     await User.updateEmail(id, email);
                 }
             }
-        } else if (req.body.password) {
+        }
+
+        if (req.body.name) {
+            const name = req.body.name.toString();
+            if (name !== ogName) {
+                isSame = false;
+                await User.updateName(id, name);
+            }
+        }
+
+        if (req.body.password) {
             const password = req.body.password.toString();
             if (password !== ogPassword) {
                 isSame = false;
                 await User.updatePassword(id, password);
             }
-        } else if (req.body.city) {
+        }
+
+        if (req.body.city) {
             const city = req.body.city.toString();
             if (city !== ogCity) {
                 isSame = false;
                 await User.updateCity(id, city);
             }
-        } else if (req.body.country) {
+        }
+
+        if (req.body.country) {
             const country = req.body.country.toString();
             if (country !== ogCountry) {
                 isSame = false;

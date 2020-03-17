@@ -106,6 +106,19 @@ exports.getToken = async function(id){
     }
 };
 
+//Return id associated with the token
+exports.getId = async function(token){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT user_id FROM User WHERE auth_token = " + "'" + token + "'";
+        const [user, _] = await connection.query(sql);
+        connection.release();
+        return user[0].user_id;
+    } catch {
+        return -1;
+    }
+};
+
 //Get all user details associated with the id
 exports.getDetails = async function(id){
     try {
@@ -124,7 +137,7 @@ exports.getDetails = async function(id){
     }
 };
 
-//Insert token into database by id, return token
+//Update name
 exports.updateName = async function(id, name){
     try {
         const connection = await db.getPool().getConnection();
@@ -136,7 +149,7 @@ exports.updateName = async function(id, name){
     }
 };
 
-//Insert token into database by id, return token
+////Update email
 exports.updateEmail = async function(id, email){
     try {
         const connection = await db.getPool().getConnection();
@@ -148,7 +161,7 @@ exports.updateEmail = async function(id, email){
     }
 };
 
-//Insert token into database by id, return token
+//Update password
 exports.updatePassword = async function(id, password){
     try {
         const connection = await db.getPool().getConnection();
@@ -160,7 +173,7 @@ exports.updatePassword = async function(id, password){
     }
 };
 
-//Insert token into database by id, return token
+//Update city
 exports.updateCity = async function(id, city){
     try {
         const connection = await db.getPool().getConnection();
@@ -172,7 +185,7 @@ exports.updateCity = async function(id, city){
     }
 };
 
-//Insert token into database by id, return token
+//Update country
 exports.updateCountry = async function(id, country){
     try {
         const connection = await db.getPool().getConnection();
@@ -185,3 +198,18 @@ exports.updateCountry = async function(id, country){
 };
 
 
+//Checks if a user has signed a petition
+exports.hasSigned = async function(userId, petitionId) {
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT count(*) AS count FROM Signature WHERE signatory_id = " + userId + " AND petition_id = " + petitionId;
+        const [results, _] = await connection.query(sql);
+        connection.release();
+
+        if (results[0].count === 1) {
+            return true
+        }
+    } catch {
+        return -1;
+    }
+};

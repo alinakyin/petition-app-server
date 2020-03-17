@@ -32,24 +32,48 @@ exports.list = async function(req, res){
 };
 
 
-// //TODO post a petition > requires authentication
-// exports.add = async function(req, res){
-//     try {
-//         let user_data = {
-//             "username": req.body.username
-//         };
-//         let user = user_data['username'].toString();
-//         let values = [
-//             [user]
-//         ];
-//         const result = await User.insert(values);
-//         res.status(201)
-//             .send(`Inserted ${req.body.username} at id ${result}`);
-//     } catch (err) {
-//         res.status(500)
-//             .send(`ERROR posting user ${err}`);
-//     }
-// };
+//Add a new petition
+exports.add = async function(req, res){
+    try {
+        let currToken = req.get('X-Authorization');
+        const exists = await User.tokenExists(currToken);
+        if (!(exists) || currToken === undefined) {
+            return res.sendStatus(401);
+        } else {
+            let petition_data = {
+                "title": req.body.title,
+                "description": req.body.description,
+                "categoryId": req.body.categoryId,
+                "closingDate": req.body.closingDate
+            };
+
+            let title = petition_data['title'].toString();
+            let description = petition_data['description'].toString();
+            let categoryId = petition_data['categoryId'];
+            let closingDate = petition_data['closingDate'].toString();
+
+            const categoryExists = await Petition.categoryExists(categoryId);
+            let currDateTime = new Date();
+
+            if (!(categoryExists) || (closingDate < currDateTime)) {
+                return res.sendStatus(400);
+            } else {
+                const authorId = await User.getId(currToken);
+                let petition_details = [title, description, authorId, categoryId, currDateTime, closingDate];
+                let insertId = await Petition.insert(petition_details);
+                if (insertId === -1) {
+                    return res.sendStatus(400);
+                } else {
+                    return res.status(201)
+                        .send({petitionId: insertId});
+                }
+            }
+        }
+
+    } catch (err) {
+        return res.sendStatus(400);
+    }
+};
 
 
 //Retrieve detailed information about a petition
@@ -74,37 +98,117 @@ exports.listInfo = async function(req, res) {
 };
 
 
-// //TODO patch a petition > requires authentication
-// exports.changeInfo = async function(req, res){
-//     try {
-//         let id = +req.params.userId;
-//         let user_data = {
-//             "username": req.body.username
-//         };
-//         let user = user_data['username'].toString();
-//
-//         const result = await User.alter(user, id);
-//         res.status(201)
-//             .send(`Updated user at id ${id}`);
-//     } catch (err) {
-//         res.status(500)
-//             .send(`ERROR updating user ${err}`);
-//     }
-// };
+//Change a petition's details
+exports.changeInfo = async function(req, res){
+    try {
+        const petitionId = +req.params.id;
+        const isValidId = await Petition.isValidPetitionId(petitionId);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            const author_id = await Petition.getAuthor(petitionId);
+            let currToken = req.get('X-Authorization'); // the user making the request
+            if (currToken === undefined) { // no one logged in
+                return res.sendStatus(401);
+            } else {
+                const userToken = await User.getToken(author_id); // the one authorised
+                if (currToken !== userToken) {
+                    return res.sendStatus(403);
+                }
+            }
+        }
+
+        if (req.body.closingDate) {
+            const closingDate = req.body.closingDate.toString();
+            let currDateTime = new Date();
+            if (closingDate < currDateTime) {
+                return res.sendStatus(400);
+            }
+        }
+
+        if (req.body.categoryId) {
+            const categoryId = req.body.categoryId;
+            const categoryExists = await Petition.categoryExists(categoryId);
+            if (!(categoryExists)) {
+                return res.sendStatus(400);
+            }
+        }
+
+        const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
+
+        var isSame = true;
+        if (req.body.title) {
+            const title = req.body.title.toString();
+            if (title !== ogTitle) {
+                isSame = false;
+                await Petition.updateTitle(petitionId, title);
+            }
+        }
+
+        if (req.body.description) {
+            const description = req.body.description.toString();
+            if (description !== ogDescription) {
+                isSame = false;
+                await Petition.updateDescription(petitionId, description);
+            }
+        }
+
+        if (req.body.categoryId) {
+            const categoryId = req.body.categoryId;
+            if (categoryId !== ogCategoryId) {
+                isSame = false;
+                await Petition.updateCategoryId(petitionId, categoryId);
+            }
+        }
+
+        if (req.body.closingDate) {
+            const closingDate = req.body.closingDate.toString();
+            if (closingDate !== ogClosingDate) {
+                isSame = false;
+                await Petition.updateClosingDate(petitionId, closingDate);
+            }
+        }
+
+        if (isSame) {
+            return res.sendStatus(400);
+        } else {
+            return res.sendStatus(200);
+        }
+
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+};
 
 
-// //TODO delete a petition > requires authentication
-// exports.remove = async function(req, res){
-//     try {
-//         let id = +req.params.userId;
-//         const result = await User.remove(id);
-//         res.status(201)
-//             .send(`Deleted user with id ${id}`);
-//     } catch (err) {
-//         res.status(500)
-//             .send(`ERROR deleting user ${err}`);
-//     }
-// };
+//Delete a petition
+exports.remove = async function(req, res){
+    try {
+        const petitionId = +req.params.id;
+        const isValidId = await Petition.isValidPetitionId(petitionId);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            const author_id = await Petition.getAuthor(petitionId);
+            let currToken = req.get('X-Authorization'); // the user making the request
+            if (currToken === undefined) { // no one logged in
+                return res.sendStatus(401);
+            } else {
+                const userToken = await User.getToken(author_id); // the one authorised
+                if (currToken !== userToken) {
+                    return res.sendStatus(403);
+                }
+            }
+        }
+
+        await Petition.remove(petitionId);
+        await Petition.removeAll(petitionId);
+        res.sendStatus(200);
+
+    } catch (err) {
+        res.sendStatus(500);
+    }
+};
 
 
 //Retrieve all data about petition categories
@@ -142,6 +246,8 @@ exports.listCategories = async function(req, res){
 //
 //
 // //TODO Set a petition's hero image
+// //Photos located at /home/cosc/student/aph78/Postman/files
+
 // exports.setPhoto = async function(req, res){
 //     try {
 //         const petitionId = +req.params.id;
@@ -205,35 +311,65 @@ exports.listSignatures = async function(req, res){
 };
 
 
-//TODO sign a petition > requires authentication
-// exports.signPetition = async function(req, res){
-//     try {
-//         let user_data = {
-//             "username": req.body.username
-//         };
-//         let user = user_data['username'].toString();
-//         let values = [
-//             [user]
-//         ];
-//         const result = await User.insert(values);
-//         res.status(201)
-//             .send(`Inserted ${req.body.username} at id ${result}`);
-//     } catch (err) {
-//         res.status(500)
-//             .send(`ERROR posting user ${err}`);
-//     }
-// };
+//Sign a petition
+exports.signPetition = async function(req, res){
+    try {
+        let petitionId = +req.params.id;
+        const isValidId = await Petition.isValidPetitionId(petitionId);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            let currToken = req.get('X-Authorization'); // the user making the request
+            if (currToken === undefined) { // no one logged in
+                return res.sendStatus(401);
+            } else {
+                const userId = await User.getId(currToken);
+                let currDateTime = new Date();
+                const hasSigned = await User.hasSigned(userId, petitionId);
+                const hasClosed = await Petition.hasClosed(petitionId, currDateTime);
+                if (hasSigned || hasClosed) {
+                    return res.sendStatus(403);
+                } else {
+                    let signature_details = [userId, petitionId, currDateTime];
+                    await Petition.addSignature(signature_details);
+                    return res.sendStatus(201);
+                }
+            }
+        }
+
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+};
 
 
-// //TODO remove signature > requires authentication
-// exports.removeSignature = async function(req, res){
-//     try {
-//         let id = +req.params.userId;
-//         const result = await User.remove(id);
-//         res.status(201)
-//             .send(`Deleted user with id ${id}`);
-//     } catch (err) {
-//         res.status(500)
-//             .send(`ERROR deleting user ${err}`);
-//     }
-// };
+// Remove a signature from a petition
+exports.removeSignature = async function(req, res){
+    try {
+        let petitionId = +req.params.id;
+        const isValidId = await Petition.isValidPetitionId(petitionId);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            let currToken = req.get('X-Authorization'); // the user making the request
+            if (currToken === undefined) { // no one logged in
+                return res.sendStatus(401);
+            } else {
+                const userId = await User.getId(currToken);
+                const author = await Petition.getAuthor(petitionId);
+                let currDateTime = new Date();
+                const hasSigned = await User.hasSigned(userId, petitionId);
+                const hasClosed = await Petition.hasClosed(petitionId, currDateTime);
+                if (!(hasSigned) || hasClosed || (userId === author)) {
+                    return res.sendStatus(403);
+                } else {
+                    await Petition.removeOne(userId, petitionId);
+                    return res.sendStatus(200);
+                }
+            }
+        }
+
+    } catch (err) {
+        return res.sendStatus(500);
+    }
+};
