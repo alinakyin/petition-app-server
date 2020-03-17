@@ -136,6 +136,7 @@ exports.changeInfo = async function(req, res){
         if (valid) {
             const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
             var isSame = true;
+
             if (req.body.title) {
                 const title = req.body.title.toString();
                 if (title !== ogTitle) {
@@ -169,7 +170,7 @@ exports.changeInfo = async function(req, res){
             }
 
             if (isSame) {
-                return res.sendStatus(400);
+                return res.sendStatus(402);
             } else {
                 return res.sendStatus(200);
             }
