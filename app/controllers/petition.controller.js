@@ -118,61 +118,64 @@ exports.changeInfo = async function(req, res){
             }
         }
 
+        var valid = true;
         if (req.body.closingDate) {
-            const closingDate = req.body.closingDate.toString();
             let currDateTime = new Date();
-            if (closingDate < currDateTime) {
-                return res.sendStatus(400);
+            if (req.body.closingDate < currDateTime) {
+                valid = false;
             }
         }
 
         if (req.body.categoryId) {
-            const categoryId = req.body.categoryId;
-            const categoryExists = await Petition.categoryExists(categoryId);
+            const categoryExists = await Petition.categoryExists(req.body.categoryId);
             if (!(categoryExists)) {
+                valid = false;
+            }
+        }
+
+        if (valid) {
+            const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
+            var isSame = true;
+            if (req.body.title) {
+                const title = req.body.title.toString();
+                if (title !== ogTitle) {
+                    isSame = false;
+                    await Petition.updateTitle(petitionId, title);
+                }
+            }
+
+            if (req.body.description) {
+                const description = req.body.description.toString();
+                if (description !== ogDescription) {
+                    isSame = false;
+                    await Petition.updateDescription(petitionId, description);
+                }
+            }
+
+            if (req.body.categoryId) {
+                const categoryId = req.body.categoryId;
+                if (categoryId !== ogCategoryId) {
+                    isSame = false;
+                    await Petition.updateCategoryId(petitionId, categoryId);
+                }
+            }
+
+            if (req.body.closingDate) {
+                const closingDate = req.body.closingDate.toString();
+                if (closingDate !== ogClosingDate) {
+                    isSame = false;
+                    await Petition.updateClosingDate(petitionId, closingDate);
+                }
+            }
+
+            if (isSame) {
                 return res.sendStatus(400);
+            } else {
+                return res.sendStatus(200);
             }
-        }
 
-        const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
-
-        var isSame = true;
-        if (req.body.title) {
-            const title = req.body.title.toString();
-            if (title !== ogTitle) {
-                isSame = false;
-                await Petition.updateTitle(petitionId, title);
-            }
-        }
-
-        if (req.body.description) {
-            const description = req.body.description.toString();
-            if (description !== ogDescription) {
-                isSame = false;
-                await Petition.updateDescription(petitionId, description);
-            }
-        }
-
-        if (req.body.categoryId) {
-            const categoryId = req.body.categoryId;
-            if (categoryId !== ogCategoryId) {
-                isSame = false;
-                await Petition.updateCategoryId(petitionId, categoryId);
-            }
-        }
-
-        if (req.body.closingDate) {
-            const closingDate = req.body.closingDate.toString();
-            if (closingDate !== ogClosingDate) {
-                isSame = false;
-                await Petition.updateClosingDate(petitionId, closingDate);
-            }
-        }
-
-        if (isSame) {
-            return res.sendStatus(400);
         } else {
-            return res.sendStatus(200);
+            return res.sendStatus(406); // for debugging
         }
 
     } catch (err) {
