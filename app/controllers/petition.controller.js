@@ -1,4 +1,5 @@
 const Petition = require('../models/petition.model');
+const User = require('../models/user.model');
 
 //View petitions
 exports.list = async function(req, res){
@@ -122,33 +123,62 @@ exports.listCategories = async function(req, res){
 };
 
 
-//Retrieve a petition's hero image
-exports.showPhoto = async function(req, res){
-    let id = +req.params.id;
-    await Petition.getPhoto(id, function(result) {
-        if (result === undefined) {
-            res.sendStatus(500);
-        } else if (result === "Not found") {
-            res.sendStatus(404);
-        } else {
-            var filename = result[0].photo_filename;
-            res.status(200)
-                .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/' + filename); // TODO probably not a good way to do this
-        }
-    });
-};
-
-
-// //TODO set a petition's photo > requires authentication
+// //TODO Retrieve a petition's hero image (depends on setPhoto)
+// exports.showPhoto = async function(req, res){
+//     try {
+//         let id = +req.params.id;
+//         const isValidId = await Petition.isValidPetitionId(id);
+//         if (!(isValidId)) {
+//             res.sendStatus(404);
+//         } else {
+//             const photo_filename = await Petition.getPhoto(id);
+//             res.status(200)
+//                 .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/' + photo_filename); // TODO probably not a good way to do this
+//         }
+//     } catch (err) {
+//         res.sendStatus(500);
+//     }
+// };
+//
+//
+// //TODO Set a petition's hero image
 // exports.setPhoto = async function(req, res){
 //     try {
-//         const id = +req.params.userId;
-//         const result = await User.getOne(id);
-//         res.status(200)
-//             .send(result);
+//         const petitionId = +req.params.id;
+//         const isValidId = await Petition.isValidPetitionId(petitionId);
+//         if (!(isValidId)) {
+//             res.sendStatus(404);
+//         } else {
+//             const author_id = await getAuthor(petitionId);
+//             let currToken = req.get('X-Authorization'); // the user making the request
+//             if (currToken === undefined) { // no one logged in
+//                 res.sendStatus(401);
+//             } else {
+//                 const userToken = await User.getToken(author_id); // the one authorised
+//                 if (currToken !== userToken) {
+//                     res.sendStatus(403); // TODO should return this?? to end the function
+//                 }
+//             }
+//
+//             const photoType = req.get('Content-Type');
+//             if (photoType !== ('image/png' || 'image/jpeg' || 'image/gif')) {
+//                 res.sendStatus(400);
+//             } else {
+//                 const photo = req.body;
+//                 console.log(photo);
+//                 await Petition.putPhoto(petitionId, photo);
+//             }
+//
+//             const currPhoto = await Petition.getPhoto(petitionId);
+//             if (currPhoto === undefined) {
+//                 res.sendStatus(201);
+//             } else {
+//                 res.sendStatus(200);
+//             }
+//         }
 //     } catch (err) {
-//         res.status(500)
-//             .send(`ERROR fetching user ${err}`);
+//         console.log(err);
+//         res.sendStatus(500);
 //     }
 // };
 

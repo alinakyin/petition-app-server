@@ -14,7 +14,7 @@ module.exports = function(app) {
         //.delete(petitions.remove);
 
     app.route(app.rootUrl + '/petitions/:id/photo')
-        .get(petitions.showPhoto);
+        .get(petitions.showPhoto)
         //.put(petitions.setPhoto);
 
     app.route(app.rootUrl + '/petitions/:id/signatures')

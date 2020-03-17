@@ -110,23 +110,49 @@ exports.getCategories = async function(){
 };
 
 
-//Retrieve a petition's hero image
-exports.getPhoto = async function(petitionId, done){
-    const connection = await db.getPool().getConnection();
-    const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+// //Retrieve a petition's hero image photo_filename
+// exports.getPhoto = async function(petitionId){
+//     try {
+//         const connection = await db.getPool().getConnection();
+//         const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+//
+//         const [results, _] = await connection.query(sql);
+//         connection.release();
+//         return results[0].photo_filename;
+//     } catch {
+//         return -1;
+//     }
+// };
+//
+//
+// //TODO Set a petition's hero image
+// exports.putPhoto = async function(petitionId){
+//     try {
+//         const connection = await db.getPool().getConnection();
+//         const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+//
+//         const [results, _] = await connection.query(sql);
+//         connection.release();
+//         return results;
+//     } catch {
+//         return -1;
+//     }
+// };
+//
 
-    await connection.query(sql, function(err, result) {
-        if (err) {
-            connection.release();
-            return done();
-        } else if (result.length === 0) {
-            connection.release();
-            return done("Not found");
-        } else {
-            connection.release();
-            return done(result);
-        }
-    });
+
+//Retrieve author_id of a petition
+exports.getAuthor = async function(petitionId){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT author_id FROM Petition where petition_id = " + petitionId;
+
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        return results[0].author_id;
+    } catch {
+        return -1;
+    }
 };
 
 
@@ -145,6 +171,7 @@ exports.getSignatures = async function(petitionId){
         return -1;
     }
 };
+
 
 //Checks that petition exists
 exports.isValidPetitionId = async function(petitionId) {
