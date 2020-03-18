@@ -116,7 +116,7 @@ exports.changeInfo = async function(req, res){
             }
         }
 
-        var valid = true;
+        let valid = true;
         if (req.body.closingDate) {
             let currDateTime = new Date();
             if (req.body.closingDate < currDateTime) {
@@ -133,7 +133,7 @@ exports.changeInfo = async function(req, res){
 
         if (valid) {
             const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
-            var isSame = true;
+            let isSame = true;
 
             if (req.body.title) {
                 const title = req.body.title.toString();

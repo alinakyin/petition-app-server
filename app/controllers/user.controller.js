@@ -137,7 +137,7 @@ exports.changeInfo = async function(req, res) {
             return res.sendStatus(400);
         }
 
-        var isSame = true;
+        let isSame = true;
         if (req.body.email) {
             const email = req.body.email.toString();
             const isAvailable = await User.emailAvailable(email);
