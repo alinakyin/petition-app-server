@@ -168,9 +168,16 @@ exports.updateCategoryId = async function(id, categoryId){
 exports.updateClosingDate = async function(id, closingDate){
     try {
         const connection = await db.getPool().getConnection();
-        const sql = "UPDATE Petition SET closing_date = ? WHERE petition_id = " + id;
-        await connection.query(sql, [closingDate]);
-        connection.release();
+        if (closingDate == null) {
+            let sql = "UPDATE Petition SET closing_date = NULL WHERE petition_id = " + id;
+            await connection.query(sql);
+            connection.release();
+        } else {
+            let sql = "UPDATE Petition SET closing_date = ? WHERE petition_id = " + id;
+            await connection.query(sql, [closingDate]);
+            connection.release();
+        }
+
     } catch {
         return -1;
     }

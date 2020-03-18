@@ -171,6 +171,14 @@ exports.changeInfo = async function(req, res){
                 }
             }
 
+            if (req.body.closingDate == null) {
+                if (ogClosingDate != null) {
+                    isSame = false;
+                    console.log(isSame + " nullify closingDate");
+                    await Petition.updateClosingDate(petitionId, req.body.closingDate);
+                }
+            }
+
             console.log(isSame + " outer");
             if (isSame) {
                 return res.sendStatus(400); //TODO ending up here when it shouldn't
@@ -183,6 +191,7 @@ exports.changeInfo = async function(req, res){
         }
 
     } catch (err) {
+        console.log(err)
         return res.sendStatus(500);
     }
 };
