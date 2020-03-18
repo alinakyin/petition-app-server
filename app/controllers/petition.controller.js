@@ -343,7 +343,9 @@ exports.showPhoto = async function(req, res){
             return res.sendStatus(404);
         } else {
             const photo_filename = await Petition.getPhoto(id);
-            console.log(photo_filename);
+            if (photo_filename == null) {
+                return res.sendStatus(404);
+            }
             const file = fs.createReadStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + photo_filename);
             file.pipe(res);
             return res.status(200);
