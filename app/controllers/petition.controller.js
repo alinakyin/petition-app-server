@@ -139,39 +139,39 @@ exports.changeInfo = async function(req, res){
                 const title = req.body.title.toString();
                 if (title !== ogTitle) {
                     isSame = false;
-                    console.log(isSame);
+                    console.log(isSame + " title");
                     await Petition.updateTitle(petitionId, title);
                 }
             }
-            console.log(isSame);
+            console.log(isSame + " outer");
             if (req.body.description) {
                 const description = req.body.description.toString();
                 if (description !== ogDescription) {
                     isSame = false;
-                    console.log(isSame);
+                    console.log(isSame + " description");
                     await Petition.updateDescription(petitionId, description);
                 }
             }
-            console.log(isSame);
+            console.log(isSame + " outer");
             if (req.body.categoryId) {
                 const categoryId = req.body.categoryId;
                 if (categoryId !== ogCategoryId) {
                     isSame = false;
-                    console.log(isSame);
+                    console.log(isSame + " categoryId");
                     await Petition.updateCategoryId(petitionId, categoryId);
                 }
             }
-            console.log(isSame);
+            console.log(isSame + " outer");
             if (req.body.closingDate) {
                 const closingDate = req.body.closingDate.toString();
                 if (closingDate !== ogClosingDate) {
                     isSame = false;
-                    console.log(isSame);
+                    console.log(isSame + " closingDate");
                     await Petition.updateClosingDate(petitionId, closingDate);
                 }
             }
 
-            console.log(isSame);
+            console.log(isSame + " outer");
             if (isSame) {
                 return res.sendStatus(400); //TODO ending up here when it shouldn't
             } else {
