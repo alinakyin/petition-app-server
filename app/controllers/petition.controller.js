@@ -347,10 +347,16 @@ exports.showPhoto = async function(req, res){
                 return res.sendStatus(404);
             }
             const type = photo_filename.split('.')[1];
-            const file = fs.createReadStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + photo_filename);
-            res.type(type);
-            file.pipe(res);
-            return res.status(200);
+            await fs.readFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + photo_filename, function(err, image) {
+                if (err) {
+                    console.log(err);
+                    return res.sendStatus(500);
+                } else {
+                    res.type(type);
+                    return res.status(200)
+                        .send(image);
+                }
+            });
         }
     } catch (err) {
         console.log(err);
