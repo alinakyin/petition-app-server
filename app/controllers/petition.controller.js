@@ -346,7 +346,9 @@ exports.showPhoto = async function(req, res){
             if (photo_filename == null) {
                 return res.sendStatus(404);
             }
+            const type = photo_filename.split('.')[1];
             const file = fs.createReadStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + photo_filename);
+            res.type(type);
             file.pipe(res);
             return res.status(200);
         }
@@ -375,33 +377,35 @@ exports.setPhoto = async function(req, res){
                     return res.sendStatus(403);
                 }
             }
-
-            const currPhoto = await Petition.getPhoto(petitionId);
-            // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
-            const photoType = req.get('Content-Type');
-            if (photoType === 'image/jpeg') {
-                const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.jpg');
-                req.pipe(file);
-                await Petition.putPhoto(petitionId, 'petition_sample.jpg');
-            } else if (photoType === 'image/png') {
-                const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.png');
-                req.pipe(file);
-                await Petition.putPhoto(petitionId, 'petition_sample.png');
-            } else if (photoType === 'image/gif') {
-                const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.gif');
-                req.pipe(file);
-                await Petition.putPhoto(petitionId, 'petition_sample.gif');
-            } else {
-                return res.sendStatus(400);
-            }
-
-            if (currPhoto == null) {
-                return res.sendStatus(201);
-            } else {
-                return res.sendStatus(200);
-            }
         }
+
+        const currPhoto = await Petition.getPhoto(petitionId);
+        // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
+        const photoType = req.get('Content-Type');
+        if (photoType === 'image/jpeg') {
+            const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.jpg');
+            req.pipe(file);
+            await Petition.putPhoto(petitionId, 'petition_sample.jpg');
+        } else if (photoType === 'image/png') {
+            const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.png');
+            req.pipe(file);
+            await Petition.putPhoto(petitionId, 'petition_sample.png');
+        } else if (photoType === 'image/gif') {
+            const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.gif');
+            req.pipe(file);
+            await Petition.putPhoto(petitionId, 'petition_sample.gif');
+        } else {
+            return res.sendStatus(400);
+        }
+
+        if (currPhoto == null) {
+            return res.sendStatus(201);
+        } else {
+            return res.sendStatus(200);
+        }
+
     } catch (err) {
+        console.log(err);
         return res.sendStatus(500);
     }
 };
