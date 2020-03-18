@@ -45,7 +45,7 @@ exports.getPetitions = async function(q, categoryId, authorId, sortBy) {
 };
 
 
-//Inserts a new petition
+//Insert a new petition
 exports.insert = async function(petition_details){
     try {
         const connection = await db.getPool().getConnection();
@@ -59,7 +59,7 @@ exports.insert = async function(petition_details){
 };
 
 
-//Checks that a category exists
+//Check that a category exists
 exports.categoryExists = async function(categoryId) {
     try {
         const connection = await db.getPool().getConnection();
@@ -67,7 +67,7 @@ exports.categoryExists = async function(categoryId) {
         const [results, _] = await connection.query(sql);
         connection.release();
         if (results[0].count === 1) {
-            return true
+            return true;
         }
     } catch {
         return -1;
@@ -106,7 +106,7 @@ exports.getDetails = async function(id){
         const title = row[0].title;
         const description = row[0].description;
         const categoryId = row[0].category_id;
-        const closingDate = row[0].closing_date
+        const closingDate = row[0].closing_date;
         return [title, description, categoryId, closingDate];
     } catch {
         return -1;
@@ -172,21 +172,25 @@ exports.remove = async function(id){
         const connection = await db.getPool().getConnection();
         const sql = 'DELETE FROM Petition WHERE petition_id = ?';
         await connection.query(sql, [id]);
+        connection.release();
     } catch {
         return -1;
     }
 };
 
-//Delete a petition's signatures
+
+//Delete all of a petition's signatures
 exports.removeAll = async function(id){
     try {
         const connection = await db.getPool().getConnection();
         const sql = 'DELETE FROM Signature WHERE petition_id = ?';
         await connection.query(sql, [id]);
+        connection.release();
     } catch {
         return -1;
     }
 };
+
 
 //Retrieve all data about petition categories
 exports.getCategories = async function(){
@@ -196,42 +200,12 @@ exports.getCategories = async function(){
 
         const [results, _] = await connection.query(sql);
         connection.release();
+        console.log(results);
         return results;
     } catch {
         return -1;
     }
 };
-
-
-// //Retrieve a petition's hero image photo_filename
-// exports.getPhoto = async function(petitionId){
-//     try {
-//         const connection = await db.getPool().getConnection();
-//         const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
-//
-//         const [results, _] = await connection.query(sql);
-//         connection.release();
-//         return results[0].photo_filename;
-//     } catch {
-//         return -1;
-//     }
-// };
-//
-//
-// //TODO Set a petition's hero image
-// exports.putPhoto = async function(petitionId){
-//     try {
-//         const connection = await db.getPool().getConnection();
-//         const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
-//
-//         const [results, _] = await connection.query(sql);
-//         connection.release();
-//         return results;
-//     } catch {
-//         return -1;
-//     }
-// };
-//
 
 
 //Retrieve author_id of a petition
@@ -266,7 +240,7 @@ exports.getSignatures = async function(petitionId){
 };
 
 
-//Checks if a petition has closed
+//Check if a petition has closed
 exports.hasClosed = async function(petitionId, currentDate) {
     try {
         const connection = await db.getPool().getConnection();
@@ -274,7 +248,7 @@ exports.hasClosed = async function(petitionId, currentDate) {
         const [results, _] = await connection.query(sql);
         connection.release();
         if (results[0].closing_date < currentDate) {
-            return true
+            return true;
         }
     } catch {
         return -1;
@@ -282,7 +256,7 @@ exports.hasClosed = async function(petitionId, currentDate) {
 };
 
 
-//Inserts a new petition
+//Insert a new petition
 exports.addSignature = async function(signature_details){
     try {
         const connection = await db.getPool().getConnection();
@@ -302,13 +276,14 @@ exports.removeOne = async function(userId, petitionId){
         const connection = await db.getPool().getConnection();
         const sql = 'DELETE FROM Signature WHERE signatory_id = ? AND petition_id = ?';
         await connection.query(sql, [userId, petitionId]);
+        connection.release();
     } catch {
         return -1;
     }
 };
 
 
-//Checks that petition exists
+//Check that petition exists
 exports.isValidPetitionId = async function(petitionId) {
     try {
         const connection = await db.getPool().getConnection();
@@ -316,9 +291,44 @@ exports.isValidPetitionId = async function(petitionId) {
         const [results, _] = await connection.query(sql);
         connection.release();
         if (results[0].count === 1) {
-            return true
+            return true;
         }
     } catch {
         return -1;
     }
 };
+
+
+/*
+//Retrieve a petition's hero image photo_filename
+exports.getPhoto = async function(petitionId){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        return results[0].photo_filename;
+    } catch {
+        return -1;
+    }
+};
+
+
+//TODO Set a petition's hero image
+exports.putPhoto = async function(petitionId){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        return results;
+    } catch {
+        return -1;
+    }
+};
+
+
+
+ */

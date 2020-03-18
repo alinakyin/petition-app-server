@@ -6,13 +6,14 @@ exports.emailAvailable = async function(email){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT count(*) AS count FROM User WHERE email = " + "'" + email + "'";
     const [result, _] = await connection.query(sql);
+    connection.release();
     if (result[0].count === 0) {
-        connection.release();
-        return true
+        return true;
     }
 };
 
-//Inserts a new user
+
+//Insert a new user
 exports.insert = async function(user_details){
     try {
         const connection = await db.getPool().getConnection();
@@ -24,6 +25,7 @@ exports.insert = async function(user_details){
         return -1;
     }
 };
+
 
 //Return id associated with the email
 exports.getUserByEmail = async function(email){
@@ -39,6 +41,7 @@ exports.getUserByEmail = async function(email){
 
 };
 
+
 //Insert token into database by id, return token
 exports.insertToken = async function(id){
     try {
@@ -53,16 +56,18 @@ exports.insertToken = async function(id){
     }
 };
 
+
 //Return true if token exists
 exports.tokenExists = async function(token){
     const connection = await db.getPool().getConnection();
     const sql = "SELECT count(*) AS count FROM User WHERE auth_token = " + "'" + token + "'";
     const [result, _] = await connection.query(sql);
+    connection.release();
     if (result[0].count === 1) {
-        connection.release();
-        return true
+        return true;
     }
 };
+
 
 //Delete token from database
 exports.deleteToken = async function(token){
@@ -75,6 +80,7 @@ exports.deleteToken = async function(token){
         return -1;
     }
 };
+
 
 //Get some user details associated with the id
 exports.getSomeDetails = async function(id){
@@ -93,6 +99,7 @@ exports.getSomeDetails = async function(id){
     }
 };
 
+
 //Return token associated with the id
 exports.getToken = async function(id){
     try {
@@ -106,6 +113,7 @@ exports.getToken = async function(id){
     }
 };
 
+
 //Return id associated with the token
 exports.getId = async function(token){
     try {
@@ -118,6 +126,7 @@ exports.getId = async function(token){
         return -1;
     }
 };
+
 
 //Get all user details associated with the id
 exports.getDetails = async function(id){
@@ -137,6 +146,7 @@ exports.getDetails = async function(id){
     }
 };
 
+
 //Update name
 exports.updateName = async function(id, name){
     try {
@@ -149,7 +159,8 @@ exports.updateName = async function(id, name){
     }
 };
 
-////Update email
+
+//Update email
 exports.updateEmail = async function(id, email){
     try {
         const connection = await db.getPool().getConnection();
@@ -160,6 +171,7 @@ exports.updateEmail = async function(id, email){
         return -1;
     }
 };
+
 
 //Update password
 exports.updatePassword = async function(id, password){
@@ -173,6 +185,7 @@ exports.updatePassword = async function(id, password){
     }
 };
 
+
 //Update city
 exports.updateCity = async function(id, city){
     try {
@@ -184,6 +197,7 @@ exports.updateCity = async function(id, city){
         return -1;
     }
 };
+
 
 //Update country
 exports.updateCountry = async function(id, country){
@@ -198,16 +212,15 @@ exports.updateCountry = async function(id, country){
 };
 
 
-//Checks if a user has signed a petition
+//Check if a user has signed a petition
 exports.hasSigned = async function(userId, petitionId) {
     try {
         const connection = await db.getPool().getConnection();
         const sql = "SELECT count(*) AS count FROM Signature WHERE signatory_id = " + userId + " AND petition_id = " + petitionId;
         const [results, _] = await connection.query(sql);
         connection.release();
-
         if (results[0].count === 1) {
-            return true
+            return true;
         }
     } catch {
         return -1;

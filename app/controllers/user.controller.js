@@ -43,7 +43,8 @@ exports.register = async function(req, res){
     }
 };
 
-//Log in as an existing user (changed 500 to 400?)
+
+//Log in as an existing user
 exports.login = async function(req, res){
     try {
         let user_data = {
@@ -72,6 +73,7 @@ exports.login = async function(req, res){
     }
 };
 
+
 //Log out the currently authorised user
 exports.logout = async function(req, res){
     try {
@@ -87,6 +89,7 @@ exports.logout = async function(req, res){
         return res.sendStatus(500);
     }
 };
+
 
 //Retrieve information about a user
 exports.getInfo = async function(req, res){
@@ -110,6 +113,7 @@ exports.getInfo = async function(req, res){
         return res.sendStatus(404);
     }
 };
+
 
 //Change a user's details
 exports.changeInfo = async function(req, res) {
@@ -189,6 +193,7 @@ exports.changeInfo = async function(req, res) {
         return res.sendStatus(500);
     }
 };
+
 
 /*
 exports.setPhoto = async function(req, res){
