@@ -89,7 +89,18 @@ exports.getOne = async function(petitionId){
 
         const [results, _] = await connection.query(sql);
         connection.release();
-        return results;
+        const title = results[0].title;
+        const category = results[0].category;
+        const authorName = results[0].authorName;
+        const signatureCount = results[0].signatureCount;
+        const description = results[0].description;
+        const authorId = results[0].authorId;
+        const authorCity = results[0].authorCity;
+        const authorCountry = results[0].authorCountry;
+        const createdDate = results[0].createdDate;
+        const closingDate = results[0].closingDate;
+        return [petitionId, title, category, authorName, signatureCount, description, authorId, authorCity, authorCountry, createdDate, closingDate];
+
     } catch {
         return -1;
     }
@@ -200,7 +211,6 @@ exports.getCategories = async function(){
 
         const [results, _] = await connection.query(sql);
         connection.release();
-        console.log(results);
         return results;
     } catch {
         return -1;

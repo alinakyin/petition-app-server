@@ -76,22 +76,20 @@ exports.add = async function(req, res){
 };
 
 
-//Retrieve detailed information about a petition
+//Retrieve detailed information about a petition TODO doesn't work for petitions I've posted?
 exports.listInfo = async function(req, res) {
     try {
         let id = +req.params.id;
         const isValidId = await Petition.isValidPetitionId(id);
+
         if (!(isValidId)) {
             return res.sendStatus(404);
         } else {
-            const results = await Petition.getOne(id);
-            if (results === -1) {
-                return res.sendStatus(500);
-            } else {
-                return res.status(200)
-                    .send(results);
+            const [petitionId, title, category, authorName, signatureCount, description, authorId, authorCity, authorCountry, createdDate, closingDate] = await Petition.getOne(id);
+            return res.status(200)
+                .send({petitionId: petitionId, title: title, category: category, authorName: authorName, signatureCount: signatureCount, description: description,
+                authorId: authorId, authorCity: authorCity, authorCountry: authorCountry, createdDate: createdDate, closingDate: closingDate});
             }
-        }
     } catch (err) {
         return res.sendStatus(500);
     }
@@ -170,13 +168,13 @@ exports.changeInfo = async function(req, res){
             }
 
             if (isSame) {
-                return res.sendStatus(402); //TODO ending up here when it shouldn't
+                return res.sendStatus(400); //TODO ending up here when it shouldn't
             } else {
                 return res.sendStatus(200);
             }
 
         } else {
-            return res.sendStatus(406); // for debugging
+            return res.sendStatus(400); // for debugging
         }
 
     } catch (err) {
@@ -222,8 +220,12 @@ exports.listCategories = async function(req, res){
         if (results === -1) {
             return res.sendStatus(500);
         } else {
+            let categories = [];
+            for (let i = 0; i < results.length; i++) {
+                categories.push({categoryId: results[i].category_id, name: results[i].name});
+            }
             return res.status(200)
-                .send(results);
+                .send(categories);
         }
     } catch (err) {
         return res.sendStatus(500);
