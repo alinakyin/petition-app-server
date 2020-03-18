@@ -1,6 +1,7 @@
 const Petition = require('../models/petition.model');
 const User = require('../models/user.model');
 const fs = require('fs');
+const photoDirectory = './storage/photos/';
 
 //View petitions
 exports.list = async function(req, res){
@@ -347,16 +348,15 @@ exports.showPhoto = async function(req, res){
                 return res.sendStatus(404);
             }
             const type = photo_filename.split('.')[1];
-            await fs.readFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + photo_filename, function(err, image) {
-                if (err) {
-                    console.log(err);
-                    return res.sendStatus(500);
-                } else {
-                    res.type(type);
-                    return res.status(200)
-                        .send(image);
-                }
-            });
+            const image = fs.createReadStream(photoDirectory + photo_filename);
+
+            image.on('close', () => {
+                res.end();
+            })
+
+            image.pipe(res);
+            res.type(type);
+            return res.status(200);
         }
     } catch (err) {
         console.log(err);
@@ -389,15 +389,15 @@ exports.setPhoto = async function(req, res){
         // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
         const photoType = req.get('Content-Type');
         if (photoType === 'image/jpeg') {
-            const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.jpg');
+            const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
         } else if (photoType === 'image/png') {
-            const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.png');
+            const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
             req.pipe(file);
             await Petition.putPhoto(petitionId, 'petition_sample.png');
         } else if (photoType === 'image/gif') {
-            const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.gif');
+            const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
             req.pipe(file);
             await Petition.putPhoto(petitionId, 'petition_sample.gif');
         } else {
