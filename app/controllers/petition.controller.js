@@ -350,11 +350,13 @@ exports.showPhoto = async function(req, res){
             const type = photo_filename.split('.')[1];
             const image = fs.createReadStream(photoDirectory + photo_filename);
 
+            image.on('open', () => {
+                image.pipe(res);
+            });
             image.on('close', () => {
                 res.end();
-            })
+            });
 
-            image.pipe(res);
             res.type(type);
             return res.status(200);
         }
@@ -391,6 +393,10 @@ exports.setPhoto = async function(req, res){
         if (photoType === 'image/jpeg') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
+            req.on('end', () => {
+                res.end();
+            });
+
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
         } else if (photoType === 'image/png') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
