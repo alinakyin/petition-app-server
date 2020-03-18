@@ -334,27 +334,28 @@ exports.removeSignature = async function(req, res){
 };
 
 
-//TODO Retrieve a petition's hero image (depends on setPhoto)
+//Retrieve a petition's hero image
 exports.showPhoto = async function(req, res){
     try {
         let id = +req.params.id;
         const isValidId = await Petition.isValidPetitionId(id);
         if (!(isValidId)) {
-            res.sendStatus(404);
+            return res.sendStatus(404);
         } else {
             const photo_filename = await Petition.getPhoto(id);
-            res.status(200)
-                .sendFile('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/default/' + photo_filename); // TODO probably not a good way to do this
+            console.log(photo_filename);
+            const file = fs.createReadStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + photo_filename);
+            file.pipe(res);
+            return res.status(200);
         }
     } catch (err) {
-        res.sendStatus(500);
+        console.log(err);
+        return res.sendStatus(500);
     }
 };
 
 
-//TODO Set a petition's hero image
-//Photos located at /home/cosc/student/aph78/Postman/files
-
+//Set a petition's hero image
 exports.setPhoto = async function(req, res){
     try {
         const petitionId = +req.params.id;
@@ -373,25 +374,32 @@ exports.setPhoto = async function(req, res){
                 }
             }
 
+            const currPhoto = await Petition.getPhoto(petitionId);
+            // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
             const photoType = req.get('Content-Type');
-            if (photoType !== ('image/png' || 'image/jpeg' || 'image/gif')) {
-                return res.sendStatus(400);
+            if (photoType === 'image/jpeg') {
+                const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.jpg');
+                req.pipe(file);
+                await Petition.putPhoto(petitionId, 'petition_sample.jpg');
+            } else if (photoType === 'image/png') {
+                const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.png');
+                req.pipe(file);
+                await Petition.putPhoto(petitionId, 'petition_sample.png');
+            } else if (photoType === 'image/gif') {
+                const file = fs.createWriteStream('/home/cosc/student/aph78/Desktop/SENG365/Assignment1/aph78/storage/photos/' + 'petition_sample.gif');
+                req.pipe(file);
+                await Petition.putPhoto(petitionId, 'petition_sample.gif');
             } else {
-                // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
-                const photo = req.body;
-                console.log(photo);
-                await Petition.putPhoto(petitionId, photo);
+                return res.sendStatus(400);
             }
 
-            const currPhoto = await Petition.getPhoto(petitionId);
-            if (currPhoto === undefined) {
+            if (currPhoto == null) {
                 return res.sendStatus(201);
             } else {
                 return res.sendStatus(200);
             }
         }
     } catch (err) {
-        console.log(err);
         return res.sendStatus(500);
     }
 };

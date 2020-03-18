@@ -320,7 +320,7 @@ exports.isValidPetitionId = async function(petitionId) {
 exports.getPhoto = async function(petitionId){
     try {
         const connection = await db.getPool().getConnection();
-        const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+        const sql = "SELECT photo_filename FROM Petition WHERE petition_id = " + petitionId;
 
         const [results, _] = await connection.query(sql);
         connection.release();
@@ -331,16 +331,16 @@ exports.getPhoto = async function(petitionId){
 };
 
 
-//TODO Set a petition's hero image
-exports.putPhoto = async function(petitionId){
+//Update a petition's photo_filename
+exports.putPhoto = async function(petitionId, filename){
     try {
         const connection = await db.getPool().getConnection();
-        const sql = "SELECT photo_filename FROM Petition where petition_id = " + petitionId;
+        const sql = "UPDATE Petition SET photo_filename = ? WHERE petition_id = " + petitionId;
 
-        const [results, _] = await connection.query(sql);
+        await connection.query(sql, [filename]);
         connection.release();
-        return results;
     } catch {
         return -1;
     }
 };
+
