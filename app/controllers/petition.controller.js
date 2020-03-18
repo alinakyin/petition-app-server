@@ -1,5 +1,6 @@
 const Petition = require('../models/petition.model');
 const User = require('../models/user.model');
+const fs = require('fs');
 
 //View petitions
 exports.list = async function(req, res){
@@ -139,47 +140,47 @@ exports.changeInfo = async function(req, res){
                 const title = req.body.title.toString();
                 if (title !== ogTitle) {
                     isSame = false;
-                    console.log(isSame + " title");
+                    //console.log(isSame + " title");
                     await Petition.updateTitle(petitionId, title);
                 }
             }
-            console.log(isSame + " outer");
+            //console.log(isSame + " outer");
             if (req.body.description) {
                 const description = req.body.description.toString();
                 if (description !== ogDescription) {
                     isSame = false;
-                    console.log(isSame + " description");
+                    //console.log(isSame + " description");
                     await Petition.updateDescription(petitionId, description);
                 }
             }
-            console.log(isSame + " outer");
+            //console.log(isSame + " outer");
             if (req.body.categoryId) {
                 const categoryId = req.body.categoryId;
                 if (categoryId !== ogCategoryId) {
                     isSame = false;
-                    console.log(isSame + " categoryId");
+                    //console.log(isSame + " categoryId");
                     await Petition.updateCategoryId(petitionId, categoryId);
                 }
             }
-            console.log(isSame + " outer");
+            //console.log(isSame + " outer");
             if (req.body.closingDate) {
                 const closingDate = req.body.closingDate.toString();
                 if (closingDate !== ogClosingDate) {
                     isSame = false;
-                    console.log(isSame + " closingDate");
+                    //console.log(isSame + " closingDate");
                     await Petition.updateClosingDate(petitionId, closingDate);
                 }
             }
-
+            //console.log(isSame + " outer");
             if (req.body.closingDate == null) {
                 if (ogClosingDate != null) {
                     isSame = false;
-                    console.log(isSame + " nullify closingDate");
+                    //console.log(isSame + " nullify closingDate");
                     await Petition.updateClosingDate(petitionId, req.body.closingDate);
                 }
             }
 
-            console.log(isSame + " outer");
+            //console.log(isSame + " outer");
             if (isSame) {
                 return res.sendStatus(400); //TODO ending up here when it shouldn't
             } else {
@@ -191,7 +192,7 @@ exports.changeInfo = async function(req, res){
         }
 
     } catch (err) {
-        console.log(err)
+        //console.log(err)
         return res.sendStatus(500);
     }
 };
@@ -333,7 +334,6 @@ exports.removeSignature = async function(req, res){
 };
 
 
-/*
 //TODO Retrieve a petition's hero image (depends on setPhoto)
 exports.showPhoto = async function(req, res){
     try {
@@ -360,23 +360,24 @@ exports.setPhoto = async function(req, res){
         const petitionId = +req.params.id;
         const isValidId = await Petition.isValidPetitionId(petitionId);
         if (!(isValidId)) {
-            res.sendStatus(404);
+            return res.sendStatus(404);
         } else {
-            const author_id = await getAuthor(petitionId);
+            const author_id = await Petition.getAuthor(petitionId);
             let currToken = req.get('X-Authorization'); // the user making the request
             if (currToken === undefined) { // no one logged in
-                res.sendStatus(401);
+                return res.sendStatus(401);
             } else {
                 const userToken = await User.getToken(author_id); // the one authorised
                 if (currToken !== userToken) {
-                    res.sendStatus(403); // TODO should return this?? to end the function
+                    return res.sendStatus(403);
                 }
             }
 
             const photoType = req.get('Content-Type');
             if (photoType !== ('image/png' || 'image/jpeg' || 'image/gif')) {
-                res.sendStatus(400);
+                return res.sendStatus(400);
             } else {
+                // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
                 const photo = req.body;
                 console.log(photo);
                 await Petition.putPhoto(petitionId, photo);
@@ -384,16 +385,14 @@ exports.setPhoto = async function(req, res){
 
             const currPhoto = await Petition.getPhoto(petitionId);
             if (currPhoto === undefined) {
-                res.sendStatus(201);
+                return res.sendStatus(201);
             } else {
-                res.sendStatus(200);
+                return res.sendStatus(200);
             }
         }
     } catch (err) {
         console.log(err);
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
-
- */

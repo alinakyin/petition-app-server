@@ -1,4 +1,6 @@
 const User = require('../models/user.model');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 //Register as a new user
 exports.register = async function(req, res){
@@ -13,7 +15,8 @@ exports.register = async function(req, res){
 
         let name = user_data['name'].toString();
         let email = user_data['email'].toString();
-        let password = user_data['password'].toString();
+        let ogPassword = user_data['password'].toString();
+        let password = await bcrypt.hash(ogPassword, saltRounds);
 
         let city = user_data['city'];
         if (city != null) {
@@ -60,12 +63,18 @@ exports.login = async function(req, res){
         if (id === -1) {
             return res.sendStatus(400);
         } else {
-            const newToken = await User.insertToken(id);
-            if (newToken === -1) {
-                return res.sendStatus(400);
+            const hashedPassword = await User.getPassword(id);
+            const passwordIsCorrect = await bcrypt.compare(password, hashedPassword);
+            if (passwordIsCorrect) {
+                const newToken = await User.insertToken(id);
+                if (newToken === -1) {
+                    return res.sendStatus(400);
+                } else {
+                    return res.status(200)
+                        .send({userId: id, token: newToken});
+                }
             } else {
-                return res.status(200)
-                    .send({userId: id, token: newToken});
+                return res.sendStatus(400);
             }
         }
     } catch (err) {

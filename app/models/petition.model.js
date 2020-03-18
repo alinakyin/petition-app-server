@@ -316,7 +316,6 @@ exports.isValidPetitionId = async function(petitionId) {
 };
 
 
-/*
 //Retrieve a petition's hero image photo_filename
 exports.getPhoto = async function(petitionId){
     try {
@@ -345,7 +344,3 @@ exports.putPhoto = async function(petitionId){
         return -1;
     }
 };
-
-
-
- */

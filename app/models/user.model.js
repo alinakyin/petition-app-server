@@ -1,5 +1,5 @@
 const db = require('../../config/db');
-var randtoken = require('rand-token');
+const randtoken = require('rand-token');
 
 //Return true if email is available
 exports.emailAvailable = async function(email){
@@ -35,6 +35,20 @@ exports.getUserByEmail = async function(email){
         const [id, _] = await connection.query(sql);
         connection.release();
         return id[0].user_id;
+    } catch {
+        return -1;
+    }
+};
+
+
+//Return hashed password associated with the id
+exports.getPassword = async function(id){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT password FROM User WHERE user_id = " + id;
+        const [row, _] = await connection.query(sql);
+        connection.release();
+        return row[0].password;
     } catch {
         return -1;
     }
