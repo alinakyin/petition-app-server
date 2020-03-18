@@ -139,7 +139,8 @@ exports.changeInfo = async function(req, res) {
 
         try {
             const currentPassword = req.body.currentPassword.toString();
-            if (!(currentPassword === ogPassword)) {
+            const passwordIsCorrect = await bcrypt.compare(currentPassword, ogPassword);
+            if (!(passwordIsCorrect)) {
                 return res.sendStatus(403);
             }
         } catch (err) {
@@ -170,9 +171,10 @@ exports.changeInfo = async function(req, res) {
 
         if (req.body.password) {
             const password = req.body.password.toString();
-            if (password !== ogPassword) {
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            if (hashedPassword !== ogPassword) {
                 isSame = false;
-                await User.updatePassword(id, password);
+                await User.updatePassword(id, hashedPassword);
             }
         }
 
