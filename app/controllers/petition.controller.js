@@ -346,19 +346,20 @@ exports.showPhoto = async function(req, res){
             const photo_filename = await Petition.getPhoto(id);
             if (photo_filename == null) {
                 return res.sendStatus(404);
+            } else {
+                const type = photo_filename.split('.')[1];
+                const image = fs.createReadStream(photoDirectory + photo_filename);
+
+                image.on('open', () => {
+                    image.pipe(res);
+                });
+                image.on('close', () => {
+                    res.end();
+                });
+
+                res.type(type);
+                return res.status(200);
             }
-            const type = photo_filename.split('.')[1];
-            const image = fs.createReadStream(photoDirectory + photo_filename);
-
-            image.on('open', () => {
-                image.pipe(res);
-            });
-            image.on('close', () => {
-                res.end();
-            });
-
-            res.type(type);
-            return res.status(200);
         }
     } catch (err) {
         console.log(err);
