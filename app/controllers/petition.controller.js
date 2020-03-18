@@ -145,7 +145,7 @@ exports.changeInfo = async function(req, res){
                     await Petition.updateTitle(petitionId, title);
                 }
             }
-            //console.log(isSame + " outer");
+            console.log(isSame + " outer");
             if (req.body.description) {
                 const description = req.body.description.toString();
                 if (description !== ogDescription) {
@@ -154,7 +154,7 @@ exports.changeInfo = async function(req, res){
                     await Petition.updateDescription(petitionId, description);
                 }
             }
-            //console.log(isSame + " outer");
+            console.log(isSame + " outer");
             if (req.body.categoryId) {
                 const categoryId = req.body.categoryId;
                 if (categoryId !== ogCategoryId) {
@@ -163,7 +163,7 @@ exports.changeInfo = async function(req, res){
                     await Petition.updateCategoryId(petitionId, categoryId);
                 }
             }
-            //console.log(isSame + " outer");
+            console.log(isSame + " outer");
             if (req.body.closingDate) {
                 const closingDate = req.body.closingDate.toString();
                 if (closingDate !== ogClosingDate) {
@@ -172,7 +172,7 @@ exports.changeInfo = async function(req, res){
                     await Petition.updateClosingDate(petitionId, closingDate);
                 }
             }
-            //console.log(isSame + " outer");
+            console.log(isSame + " outer");
             if (req.body.closingDate == null) {
                 if (ogClosingDate != null) {
                     isSame = false;
@@ -181,7 +181,7 @@ exports.changeInfo = async function(req, res){
                 }
             }
 
-            //console.log(isSame + " outer");
+            console.log(isSame + " outer");
             if (isSame) {
                 return res.sendStatus(400); //TODO ending up here when it shouldn't
             } else {
@@ -393,10 +393,6 @@ exports.setPhoto = async function(req, res){
         if (photoType === 'image/jpeg') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
-            // req.on('end', () => {
-            //     res.end();
-            // });
-
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
         } else if (photoType === 'image/png') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
