@@ -393,9 +393,9 @@ exports.setPhoto = async function(req, res){
         if (photoType === 'image/jpeg') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
-            req.on('end', () => {
-                res.end();
-            });
+            // req.on('end', () => {
+            //     res.end();
+            // });
 
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
         } else if (photoType === 'image/png') {
