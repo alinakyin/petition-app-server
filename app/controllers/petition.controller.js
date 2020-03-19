@@ -394,14 +394,29 @@ exports.setPhoto = async function(req, res){
         if (photoType === 'image/jpeg') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
+
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
         } else if (photoType === 'image/png') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
             req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
+
             await Petition.putPhoto(petitionId, 'petition_sample.png');
         } else if (photoType === 'image/gif') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
             req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
+
             await Petition.putPhoto(petitionId, 'petition_sample.gif');
         } else {
             return res.sendStatus(400);
