@@ -288,13 +288,7 @@ exports.showPhoto = async function(req, res){
                 const type = photo_filename.split('.')[1];
                 const image = fs.createReadStream(photoDirectory + photo_filename);
 
-                image.on('open', () => {
-                    image.pipe(res);
-                });
-                image.on('close', () => {
-                    res.end();
-                });
-
+                image.pipe(res);
                 res.type(type);
                 return res.status(200);
             }
