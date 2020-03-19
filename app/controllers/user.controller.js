@@ -228,6 +228,8 @@ exports.setPhoto = async function(req, res){
         }
 
         const currPhoto = await User.getPhoto(id);
+        console.log(id);
+        console.log(currPhoto);
         // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
         const photoType = req.get('Content-Type');
         if (photoType === 'image/jpeg') {
@@ -262,6 +264,7 @@ exports.setPhoto = async function(req, res){
         }
 
         if (currPhoto == null) {
+            console.log(currPhoto);
             return res.sendStatus(201);
         } else {
             return res.sendStatus(200);
