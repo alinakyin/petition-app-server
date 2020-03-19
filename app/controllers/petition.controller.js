@@ -362,7 +362,6 @@ exports.showPhoto = async function(req, res){
             }
         }
     } catch (err) {
-        console.log(err);
         return res.sendStatus(500);
     }
 };
@@ -425,7 +424,6 @@ exports.setPhoto = async function(req, res){
         }
 
     } catch (err) {
-        console.log(err);
         return res.sendStatus(500);
     }
 };
