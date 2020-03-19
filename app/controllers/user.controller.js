@@ -265,9 +265,9 @@ exports.setPhoto = async function(req, res){
 
         if (currPhoto == null) {
             console.log(currPhoto);
-            return res.sendStatus(201);
+            res.sendStatus(201);
         } else {
-            return res.sendStatus(200);
+            res.sendStatus(200);
         }
 
     } catch (err) {
