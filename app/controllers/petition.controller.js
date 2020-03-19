@@ -413,19 +413,15 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
             req.pipe(file);
 
-            file.on('close', () => {
-                res.end();
-            });
-
             await Petition.putPhoto(petitionId, 'petition_sample.gif');
         } else {
             return res.sendStatus(400);
         }
 
         if (currPhoto == null) {
-            res.sendStatus(201);
+            return res.sendStatus(201);
         } else {
-            res.sendStatus(200);
+            return res.sendStatus(200);
         }
 
     } catch (err) {

@@ -228,35 +228,21 @@ exports.setPhoto = async function(req, res){
         }
 
         const currPhoto = await User.getPhoto(id);
-        console.log(id);
-        console.log(currPhoto);
         // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
         const photoType = req.get('Content-Type');
         if (photoType === 'image/jpeg') {
             const file = fs.createWriteStream(photoDirectory + 'user_sample.jpg');
             req.pipe(file);
 
-            file.on('close', () => {
-                res.end();
-            });
-
             await User.putPhoto(id, 'user_sample.jpg');
         } else if (photoType === 'image/png') {
             const file = fs.createWriteStream(photoDirectory + 'user_sample.png');
             req.pipe(file);
 
-            file.on('close', () => {
-                res.end();
-            });
-
             await User.putPhoto(id, 'user_sample.png');
         } else if (photoType === 'image/gif') {
             const file = fs.createWriteStream(photoDirectory + 'user_sample.gif');
             req.pipe(file);
-
-            file.on('close', () => {
-                res.end();
-            });
 
             await User.putPhoto(id, 'user_sample.gif');
         } else {
@@ -264,10 +250,9 @@ exports.setPhoto = async function(req, res){
         }
 
         if (currPhoto == null) {
-            console.log(currPhoto);
-            res.sendStatus(201);
+            return res.sendStatus(201);
         } else {
-            res.sendStatus(200);
+            return res.sendStatus(200);
         }
 
     } catch (err) {
