@@ -1,6 +1,8 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const fs = require('fs');
+const photoDirectory = './storage/photos/';
 
 //Register as a new user
 exports.register = async function(req, res){
@@ -206,42 +208,130 @@ exports.changeInfo = async function(req, res) {
 };
 
 
-/*
+//Set a user's profile photo
 exports.setPhoto = async function(req, res){
     try {
-        const id = +req.params.userId;
-        const result = await User.getOne(id);
-        res.status(200)
-            .send(result);
+        const id = +req.params.id;
+        const isValidId = await User.isValidUserId(id);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            let currToken = req.get('X-Authorization'); // the user making the request
+            if (currToken === undefined) { // no one logged in
+                return res.sendStatus(401);
+            } else {
+                const userToken = await User.getToken(id); // the one authorised
+                if (currToken !== userToken) {
+                    return res.sendStatus(403);
+                }
+            }
+        }
+
+        const currPhoto = await User.getPhoto(id);
+        // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
+        const photoType = req.get('Content-Type');
+        if (photoType === 'image/jpeg') {
+            const file = fs.createWriteStream(photoDirectory + 'user_sample.jpg');
+            req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
+
+            await User.putPhoto(id, 'user_sample.jpg');
+        } else if (photoType === 'image/png') {
+            const file = fs.createWriteStream(photoDirectory + 'user_sample.png');
+            req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
+
+            await User.putPhoto(id, 'user_sample.png');
+        } else if (photoType === 'image/gif') {
+            const file = fs.createWriteStream(photoDirectory + 'user_sample.gif');
+            req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
+
+            await User.putPhoto(id, 'user_sample.gif');
+        } else {
+            return res.sendStatus(400);
+        }
+
+        if (currPhoto == null) {
+            return res.sendStatus(201);
+        } else {
+            return res.sendStatus(200);
+        }
+
     } catch (err) {
-        res.status(500)
-            .send(`ERROR fetching user ${err}`);
+        console.log(err);
+        return res.sendStatus(500);
     }
 };
 
-exports.getPhoto = async function(req, res){
+
+//Retrieve a user's profile photo
+exports.showPhoto = async function(req, res){
     try {
-        const id = +req.params.userId;
-        const result = await User.getOne(id);
-        res.status(200)
-            .send(result);
+        let id = +req.params.id;
+        const isValidId = await User.isValidUserId(id);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            const photo_filename = await User.getPhoto(id);
+            if (photo_filename == null) {
+                return res.sendStatus(404);
+            } else {
+                const type = photo_filename.split('.')[1];
+                const image = fs.createReadStream(photoDirectory + photo_filename);
+
+                image.on('open', () => {
+                    image.pipe(res);
+                });
+                image.on('close', () => {
+                    res.end();
+                });
+
+                res.type(type);
+                return res.status(200);
+            }
+        }
     } catch (err) {
-        res.status(500)
-            .send(`ERROR fetching user ${err}`);
+        console.log(err);
+        return res.sendStatus(500);
     }
 };
 
+
+//Delete a user's profile photo
 exports.removePhoto = async function(req, res){
     try {
-        let id = +req.params.userId;
-        const result = await User.remove(id);
-        res.status(201)
-            .send(`Deleted user with id ${id}`);
+        const id = +req.params.id;
+        const isValidId = await User.isValidUserId(id);
+        if (!(isValidId)) {
+            return res.sendStatus(404);
+        } else {
+            let currToken = req.get('X-Authorization'); // the user making the request
+            if (currToken === undefined) { // no one logged in
+                return res.sendStatus(401);
+            } else {
+                const userToken = await User.getToken(id); // the one authorised
+                if (currToken !== userToken) {
+                    return res.sendStatus(403);
+                }
+            }
+        }
+        await User.deletePhoto(id);
+        return res.sendStatus(200);
+
     } catch (err) {
-        res.status(500)
-            .send(`ERROR deleting user ${err}`);
+        console.log(err);
+        res.sendStatus(500);
     }
 };
 
 
- */

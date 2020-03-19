@@ -240,3 +240,60 @@ exports.hasSigned = async function(userId, petitionId) {
         return -1;
     }
 };
+
+
+//Check that user exists
+exports.isValidUserId = async function(id) {
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT count(*) AS count FROM User WHERE user_id = " + id;
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        if (results[0].count === 1) {
+            return true;
+        }
+    } catch {
+        return -1;
+    }
+};
+
+
+//Retrieve a user's photo_filename
+exports.getPhoto = async function(id){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "SELECT photo_filename FROM User WHERE user_id = " + id;
+
+        const [results, _] = await connection.query(sql);
+        connection.release();
+        return results[0].photo_filename;
+    } catch {
+        return -1;
+    }
+};
+
+//Update a users's photo_filename
+exports.putPhoto = async function(id, filename){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "UPDATE User SET photo_filename = ? WHERE user_id = " + id;
+
+        await connection.query(sql, [filename]);
+        connection.release();
+    } catch {
+        return -1;
+    }
+};
+
+
+//Delete photo_filename from database
+exports.deletePhoto = async function(id){
+    try {
+        const connection = await db.getPool().getConnection();
+        const sql = "UPDATE User SET photo_filename = NULL WHERE user_id = " + id;
+        await connection.query(sql);
+        connection.release();
+    } catch {
+        return -1;
+    }
+};
