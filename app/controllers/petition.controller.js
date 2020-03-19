@@ -161,12 +161,12 @@ exports.changeInfo = async function(req, res){
 
             if (req.body.categoryId) {
                 console.log("categoryid = " + req.body.categoryId);
-                const categoryId = req.body.categoryId;
-                if (categoryId !== ogCategoryId) {
+                // const categoryId = req.body.categoryId;
+                if (req.body.categoryId !== ogCategoryId) {
                     console.log("3changes = " + changes);
                     changes += 1;
                     //console.log(isSame + " categoryId");
-                    await Petition.updateCategoryId(petitionId, categoryId);
+                    await Petition.updateCategoryId(petitionId,  req.body.categoryId);
                 }
             }
 
