@@ -135,7 +135,12 @@ exports.changeInfo = async function(req, res){
 
         if (valid) {
             const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
+            console.log("petitionId = " + petitionId);
             console.log("ogCategoryId = " + ogCategoryId);
+            console.log("ogDescription = " + ogDescription);
+            console.log("ogClosingDate = " + ogClosingDate);
+            console.log("ogTitle = " + ogTitle);
+
             let changes = 0;
 
             if (req.body.title) {
