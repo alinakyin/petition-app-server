@@ -78,7 +78,7 @@ exports.add = async function(req, res){
 };
 
 
-//Retrieve detailed information about a petition TODO doesn't work for petitions I've posted?
+//Retrieve detailed information about a petition
 exports.listInfo = async function(req, res) {
     try {
         let id = +req.params.id;
@@ -221,10 +221,10 @@ exports.remove = async function(req, res){
 
         await Petition.remove(petitionId);
         await Petition.removeAll(petitionId);
-        res.sendStatus(200);
+        return res.sendStatus(200);
 
     } catch (err) {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 };
 
@@ -411,6 +411,10 @@ exports.setPhoto = async function(req, res){
         } else if (photoType === 'image/gif') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
             req.pipe(file);
+
+            file.on('close', () => {
+                res.end();
+            });
 
             await Petition.putPhoto(petitionId, 'petition_sample.gif');
         } else {
