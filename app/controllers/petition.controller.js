@@ -135,6 +135,7 @@ exports.changeInfo = async function(req, res){
 
         if (valid) {
             const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
+            console.log("ogCategoryId = " + ogCategoryId);
             let changes = 0;
 
             if (req.body.title) {
@@ -160,17 +161,14 @@ exports.changeInfo = async function(req, res){
             }
 
             if (req.body.categoryId) {
-                console.log("categoryid = " + req.body.categoryId);
-                // const categoryId = req.body.categoryId;
-                console.log(req.body.categoryId);
+                console.log("categoryId = " + req.body.categoryId);
                 console.log(typeof req.body.categoryId);
                 console.log(ogCategoryId);
                 console.log(typeof ogCategoryId);
                 console.log(req.body.categoryId !== ogCategoryId);
                 if (req.body.categoryId !== ogCategoryId) {
-                    console.log("3changes = " + changes);
+                    console.log("changes = " + changes);
                     changes += 1;
-                    //console.log(isSame + " categoryId");
                     await Petition.updateCategoryId(petitionId,  req.body.categoryId);
                 }
             }
@@ -181,7 +179,6 @@ exports.changeInfo = async function(req, res){
                 if (closingDate !== ogClosingDate) {
                     console.log("4changes = " + changes);
                     changes += 1;
-                    //console.log(isSame + " closingDate");
                     await Petition.updateClosingDate(petitionId, closingDate);
                 }
             }
