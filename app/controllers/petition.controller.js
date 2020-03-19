@@ -149,7 +149,7 @@ exports.changeInfo = async function(req, res){
             }
 
             if (req.body.description) {
-                console.log("descirption = " + req.body.description);
+                console.log("description = " + req.body.description);
                 const description = req.body.description.toString();
                 if (description !== ogDescription) {
                     console.log("2changes = " + changes);
@@ -162,6 +162,7 @@ exports.changeInfo = async function(req, res){
             if (req.body.categoryId) {
                 console.log("categoryid = " + req.body.categoryId);
                 // const categoryId = req.body.categoryId;
+                console.log(req.body.categoryId !== ogCategoryId);
                 if (req.body.categoryId !== ogCategoryId) {
                     console.log("3changes = " + changes);
                     changes += 1;
