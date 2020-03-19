@@ -388,27 +388,27 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
 
-            req.on('end', () => {
-                file.end();
-            });
+            // req.on('end', () => {
+            //     file.end();
+            // });
 
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
         } else if (photoType === 'image/png') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
             req.pipe(file);
 
-            req.on('end', () => {
-                file.end();
-            });
+            // req.on('end', () => {
+            //     file.end();
+            // });
 
             await Petition.putPhoto(petitionId, 'petition_sample.png');
         } else if (photoType === 'image/gif') {
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
             req.pipe(file);
 
-            req.on('end', () => {
-                file.end();
-            });
+            // req.on('end', () => {
+            //     file.end();
+            // });
 
             await Petition.putPhoto(petitionId, 'petition_sample.gif');
         } else {

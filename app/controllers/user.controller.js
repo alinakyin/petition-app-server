@@ -234,27 +234,27 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'user_sample.jpg');
             req.pipe(file);
 
-            req.on('end', () => {
-                file.end();
-            });
+            // req.on('end', () => {
+            //     file.end();
+            // });
 
             await User.putPhoto(id, 'user_sample.jpg');
         } else if (photoType === 'image/png') {
             const file = fs.createWriteStream(photoDirectory + 'user_sample.png');
             req.pipe(file);
 
-            req.on('end', () => {
-                file.end();
-            });
+            // req.on('end', () => {
+            //     file.end();
+            // });
 
             await User.putPhoto(id, 'user_sample.png');
         } else if (photoType === 'image/gif') {
             const file = fs.createWriteStream(photoDirectory + 'user_sample.gif');
             req.pipe(file); // pipes the data to the file to store it
 
-            req.on('end', () => {
-                file.end();
-            });
+            // req.on('end', () => {
+            //     file.end();
+            // });
 
             await User.putPhoto(id, 'user_sample.gif');
         } else {
