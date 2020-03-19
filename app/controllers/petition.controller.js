@@ -395,7 +395,7 @@ exports.setPhoto = async function(req, res){
             req.pipe(file);
 
             file.on('close', () => {
-                res.end();
+                file.end();
             });
 
             await Petition.putPhoto(petitionId, 'petition_sample.jpg');
@@ -404,7 +404,7 @@ exports.setPhoto = async function(req, res){
             req.pipe(file);
 
             file.on('close', () => {
-                res.end();
+                file.end();
             });
 
             await Petition.putPhoto(petitionId, 'petition_sample.png');
@@ -413,7 +413,7 @@ exports.setPhoto = async function(req, res){
             req.pipe(file);
 
             file.on('close', () => {
-                res.end();
+                file.end();
             });
 
             await Petition.putPhoto(petitionId, 'petition_sample.gif');
@@ -428,7 +428,7 @@ exports.setPhoto = async function(req, res){
         }
 
     } catch (err) {
-        return res.sendStatus(500);
+        res.sendStatus(500);
     }
 };
 

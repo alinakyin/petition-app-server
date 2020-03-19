@@ -235,7 +235,7 @@ exports.setPhoto = async function(req, res){
             req.pipe(file);
 
             file.on('close', () => {
-                res.end();
+                file.end();
             });
 
             await User.putPhoto(id, 'user_sample.jpg');
@@ -244,7 +244,7 @@ exports.setPhoto = async function(req, res){
             req.pipe(file);
 
             file.on('close', () => {
-                res.end();
+                file.end();
             });
 
             await User.putPhoto(id, 'user_sample.png');
@@ -253,7 +253,7 @@ exports.setPhoto = async function(req, res){
             req.pipe(file);
 
             file.on('close', () => {
-                res.end();
+                file.end();
             });
 
             await User.putPhoto(id, 'user_sample.gif');
