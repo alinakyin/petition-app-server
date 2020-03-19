@@ -154,7 +154,7 @@ exports.changeInfo = async function(req, res) {
             const email = req.body.email.toString();
             const isAvailable = await User.emailAvailable(email);
             if (!(isAvailable) || !(email.includes("@"))) {
-                res.sendStatus(400);
+                return res.sendStatus(400);
             } else {
                 if (email !== ogEmail) {
                     isSame = false;

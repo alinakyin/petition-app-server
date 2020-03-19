@@ -135,54 +135,57 @@ exports.changeInfo = async function(req, res){
 
         if (valid) {
             const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
-            let isSame = true;
+            let changes = 0;
 
             if (req.body.title) {
+                console.log(req.body.title);
                 const title = req.body.title.toString();
                 if (title !== ogTitle) {
-                    isSame = false;
+                    changes += 1;
                     //console.log(isSame + " title");
                     await Petition.updateTitle(petitionId, title);
                 }
             }
-            console.log(isSame + " outer");
+
             if (req.body.description) {
+                console.log(req.body.description);
                 const description = req.body.description.toString();
                 if (description !== ogDescription) {
-                    isSame = false;
+                    changes += 1;
                     //console.log(isSame + " description");
                     await Petition.updateDescription(petitionId, description);
                 }
             }
-            console.log(isSame + " outer");
+
             if (req.body.categoryId) {
+                console.log(req.body.categoryId);
                 const categoryId = req.body.categoryId;
                 if (categoryId !== ogCategoryId) {
-                    isSame = false;
+                    changes += 1;
                     //console.log(isSame + " categoryId");
                     await Petition.updateCategoryId(petitionId, categoryId);
                 }
             }
-            console.log(isSame + " outer");
+
             if (req.body.closingDate) {
+                console.log(req.body.closingDate);
                 const closingDate = req.body.closingDate.toString();
                 if (closingDate !== ogClosingDate) {
-                    isSame = false;
+                    changes += 1;
                     //console.log(isSame + " closingDate");
                     await Petition.updateClosingDate(petitionId, closingDate);
                 }
             }
-            console.log(isSame + " outer");
+
             if (req.body.closingDate == null) {
                 if (ogClosingDate != null) {
-                    isSame = false;
+                    changes += 1;
                     //console.log(isSame + " nullify closingDate");
                     await Petition.updateClosingDate(petitionId, req.body.closingDate);
                 }
             }
 
-            console.log(isSame + " outer");
-            if (isSame) {
+            if (changes === 0) {
                 return res.sendStatus(400); //TODO ending up here when it shouldn't
             } else {
                 return res.sendStatus(200);
