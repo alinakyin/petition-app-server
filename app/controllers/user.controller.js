@@ -234,7 +234,7 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'user_sample.jpg');
             req.pipe(file);
 
-            file.on('close', () => {
+            req.on('end', () => {
                 file.end();
             });
 
@@ -243,16 +243,16 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'user_sample.png');
             req.pipe(file);
 
-            file.on('close', () => {
+            req.on('end', () => {
                 file.end();
             });
 
             await User.putPhoto(id, 'user_sample.png');
         } else if (photoType === 'image/gif') {
             const file = fs.createWriteStream(photoDirectory + 'user_sample.gif');
-            req.pipe(file);
+            req.pipe(file); // pipes the data to the file to store it
 
-            file.on('close', () => {
+            req.on('end', () => {
                 file.end();
             });
 

@@ -388,7 +388,7 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
             req.pipe(file);
 
-            file.on('close', () => {
+            req.on('end', () => {
                 file.end();
             });
 
@@ -397,7 +397,7 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
             req.pipe(file);
 
-            file.on('close', () => {
+            req.on('end', () => {
                 file.end();
             });
 
@@ -406,7 +406,7 @@ exports.setPhoto = async function(req, res){
             const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
             req.pipe(file);
 
-            file.on('close', () => {
+            req.on('end', () => {
                 file.end();
             });
 
