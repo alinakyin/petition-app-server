@@ -162,6 +162,10 @@ exports.changeInfo = async function(req, res){
             if (req.body.categoryId) {
                 console.log("categoryid = " + req.body.categoryId);
                 // const categoryId = req.body.categoryId;
+                console.log(req.body.categoryId);
+                console.log(typeof req.body.categoryId);
+                console.log(ogCategoryId);
+                console.log(typeof ogCategoryId);
                 console.log(req.body.categoryId !== ogCategoryId);
                 if (req.body.categoryId !== ogCategoryId) {
                     console.log("3changes = " + changes);
