@@ -154,11 +154,10 @@ exports.changeInfo = async function(req, res){
             }
 
             if (req.body.categoryId) {
-                console.log("categoryId = " + req.body.categoryId);
+                console.log("patch categoryId = " + req.body.categoryId);
                 console.log(typeof req.body.categoryId);
                 console.log("original categoryId = " + ogCategoryId);
                 console.log(typeof ogCategoryId);
-                console.log(req.body.categoryId !== ogCategoryId);
                 if (req.body.categoryId !== ogCategoryId) {
                     isSame = false;
                     await Petition.updateCategoryId(petitionId,  req.body.categoryId);
