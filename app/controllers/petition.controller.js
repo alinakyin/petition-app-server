@@ -119,6 +119,12 @@ exports.changeInfo = async function(req, res){
         }
 
         let valid = true;
+
+        if (Object.keys(req.body).length === 0) {
+            console.log("No req.body");
+            valid = false;
+        }
+
         if (req.body.closingDate) {
             let currDateTime = new Date();
             if (req.body.closingDate < currDateTime) {
@@ -135,12 +141,12 @@ exports.changeInfo = async function(req, res){
 
         if (valid) {
             const [ogTitle, ogDescription, ogCategoryId, ogClosingDate] = await Petition.getDetails(petitionId);
-            let isSame = true;
+            //let isSame = true;
 
             if (req.body.title) {
                 const title = req.body.title.toString();
                 if (title !== ogTitle) {
-                    isSame = false;
+                    //isSame = false;
                     await Petition.updateTitle(petitionId, title);
                 }
             }
@@ -148,7 +154,7 @@ exports.changeInfo = async function(req, res){
             if (req.body.description) {
                 const description = req.body.description.toString();
                 if (description !== ogDescription) {
-                    isSame = false;
+                    //isSame = false;
                     await Petition.updateDescription(petitionId, description);
                 }
             }
@@ -159,7 +165,7 @@ exports.changeInfo = async function(req, res){
                 console.log("original categoryId = " + ogCategoryId);
                 console.log(typeof ogCategoryId);
                 if (req.body.categoryId !== ogCategoryId) {
-                    isSame = false;
+                    //isSame = false;
                     await Petition.updateCategoryId(petitionId,  req.body.categoryId);
                 }
             }
@@ -167,23 +173,25 @@ exports.changeInfo = async function(req, res){
             if (req.body.closingDate) {
                 const closingDate = req.body.closingDate.toString();
                 if (closingDate !== ogClosingDate) {
-                    isSame = false;
+                    //isSame = false;
                     await Petition.updateClosingDate(petitionId, closingDate);
                 }
             }
 
             if (req.body.closingDate == null) {
                 if (ogClosingDate != null) {
-                    isSame = false;
+                    //isSame = false;
                     await Petition.updateClosingDate(petitionId, req.body.closingDate);
                 }
             }
 
-            if (isSame) {
-                return res.sendStatus(400);
-            } else {
-                return res.sendStatus(200);
-            }
+          return res.sendStatus(200);
+
+            // if (isSame) {
+            //     return res.sendStatus(400);
+            // } else {
+            //     return res.sendStatus(200);
+            // }
 
         } else {
             return res.sendStatus(400);

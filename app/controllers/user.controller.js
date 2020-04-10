@@ -196,7 +196,7 @@ exports.changeInfo = async function(req, res) {
             }
         }
 
-        if (!(req.body)) {
+        if (Object.keys(req.body).length === 0 || Object.keys(req.body).length === 1) { // req.body empty or only password?
             return res.sendStatus(400);
         } else {
             return res.sendStatus(200);
