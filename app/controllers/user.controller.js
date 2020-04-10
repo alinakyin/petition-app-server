@@ -149,7 +149,7 @@ exports.changeInfo = async function(req, res) {
             return res.sendStatus(400);
         }
 
-        let isSame = true;
+        //let isSame = true;
         if (req.body.email) {
             const email = req.body.email.toString();
             const isAvailable = await User.emailAvailable(email);
@@ -157,7 +157,7 @@ exports.changeInfo = async function(req, res) {
                 return res.sendStatus(400);
             } else {
                 if (email !== ogEmail) {
-                    isSame = false;
+                    //isSame = false;
                     await User.updateEmail(id, email);
                 }
             }
@@ -166,7 +166,7 @@ exports.changeInfo = async function(req, res) {
         if (req.body.name) {
             const name = req.body.name.toString();
             if (name !== ogName) {
-                isSame = false;
+                //isSame = false;
                 await User.updateName(id, name);
             }
         }
@@ -175,7 +175,7 @@ exports.changeInfo = async function(req, res) {
             const password = req.body.password.toString();
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             if (hashedPassword !== ogPassword) {
-                isSame = false;
+                //isSame = false;
                 await User.updatePassword(id, hashedPassword);
             }
         }
@@ -183,7 +183,7 @@ exports.changeInfo = async function(req, res) {
         if (req.body.city) {
             const city = req.body.city.toString();
             if (city !== ogCity) {
-                isSame = false;
+                //isSame = false;
                 await User.updateCity(id, city);
             }
         }
@@ -191,16 +191,21 @@ exports.changeInfo = async function(req, res) {
         if (req.body.country) {
             const country = req.body.country.toString();
             if (country !== ogCountry) {
-                isSame = false;
+                //isSame = false;
                 await User.updateCountry(id, country);
             }
         }
 
-        if (isSame) {
+        if (!(req.body)) {
             return res.sendStatus(400);
         } else {
             return res.sendStatus(200);
         }
+        // if (isSame) {
+        //     return res.sendStatus(400);
+        // } else {
+        //     return res.sendStatus(200);
+        // }
 
     } catch (err) {
         return res.sendStatus(500);
@@ -231,32 +236,35 @@ exports.setPhoto = async function(req, res){
         // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
         const photoType = req.get('Content-Type');
         if (photoType === 'image/jpeg') {
-            const file = fs.createWriteStream(photoDirectory + 'user_sample.jpg');
+            const photoName = 'user_' + id + '.jpg';
+            const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
             // req.on('end', () => {
             //     file.end();
             // });
 
-            await User.putPhoto(id, 'user_sample.jpg');
+            await User.putPhoto(id, photoName);
         } else if (photoType === 'image/png') {
-            const file = fs.createWriteStream(photoDirectory + 'user_sample.png');
+            const photoName = 'user_' + id + '.png';
+            const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
             // req.on('end', () => {
             //     file.end();
             // });
 
-            await User.putPhoto(id, 'user_sample.png');
+            await User.putPhoto(id, photoName);
         } else if (photoType === 'image/gif') {
-            const file = fs.createWriteStream(photoDirectory + 'user_sample.gif');
+            const photoName = 'user_' + id + '.gif';
+            const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file); // pipes the data to the file to store it
 
             // req.on('end', () => {
             //     file.end();
             // });
 
-            await User.putPhoto(id, 'user_sample.gif');
+            await User.putPhoto(id, photoName);
         } else {
             return res.sendStatus(400);
         }

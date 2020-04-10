@@ -382,32 +382,35 @@ exports.setPhoto = async function(req, res){
         // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
         const photoType = req.get('Content-Type');
         if (photoType === 'image/jpeg') {
-            const file = fs.createWriteStream(photoDirectory + 'petition_sample.jpg');
+            const photoName = 'petition_' + petitionId + '.jpg';
+            const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
             // req.on('end', () => {
             //     file.end();
             // });
 
-            await Petition.putPhoto(petitionId, 'petition_sample.jpg');
+            await Petition.putPhoto(petitionId, photoName);
         } else if (photoType === 'image/png') {
-            const file = fs.createWriteStream(photoDirectory + 'petition_sample.png');
+            const photoName = 'petition_' + petitionId + '.png';
+            const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
             // req.on('end', () => {
             //     file.end();
             // });
 
-            await Petition.putPhoto(petitionId, 'petition_sample.png');
+            await Petition.putPhoto(petitionId, photoName);
         } else if (photoType === 'image/gif') {
-            const file = fs.createWriteStream(photoDirectory + 'petition_sample.gif');
+            const photoName = 'petition_' + petitionId + '.gif';
+            const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
             // req.on('end', () => {
             //     file.end();
             // });
 
-            await Petition.putPhoto(petitionId, 'petition_sample.gif');
+            await Petition.putPhoto(petitionId, photoName);
         } else {
             return res.sendStatus(400);
         }
