@@ -353,10 +353,12 @@ exports.showPhoto = async function(req, res){
                 return res.sendStatus(404);
             } else {
                 const type = photo_filename.split('.')[1];
-                const image = fs.createReadStream(photoDirectory + photo_filename);
-
-                image.pipe(res);
+                const image = fs.readFileSync(photoDirectory + photo_filename);
+                // const image = fs.createReadStream(photoDirectory + photo_filename);
+                //
+                // image.pipe(res);
                 res.type(type);
+                res.send(image);
                 return res.status(200);
             }
         }
@@ -392,34 +394,28 @@ exports.setPhoto = async function(req, res){
         if (photoType === 'image/jpeg') {
             let currDateTime = new Date().toString();
             const photoName = 'petition_' + petitionId + '_' + Date.parse(currDateTime) + '.jpg';
-            const file = fs.createWriteStream(photoDirectory + photoName);
-            req.pipe(file);
-
-            // req.on('end', () => {
-            //     file.end();
-            // });
+            const image = req.body;
+            fs.writeFileSync(photoDirectory + photoName, image);
+            // const file = fs.createWriteStream(photoDirectory + photoName);
+            // req.pipe(file);
 
             await Petition.putPhoto(petitionId, photoName);
         } else if (photoType === 'image/png') {
             let currDateTime = new Date().toString();
             const photoName = 'petition_' + petitionId + '_' + Date.parse(currDateTime) + '.png';
-            const file = fs.createWriteStream(photoDirectory + photoName);
-            req.pipe(file);
-
-            // req.on('end', () => {
-            //     file.end();
-            // });
+            const image = req.body;
+            fs.writeFileSync(photoDirectory + photoName, image);
+            // const file = fs.createWriteStream(photoDirectory + photoName);
+            // req.pipe(file);
 
             await Petition.putPhoto(petitionId, photoName);
         } else if (photoType === 'image/gif') {
             let currDateTime = new Date().toString();
             const photoName = 'petition_' + petitionId + '_' + Date.parse(currDateTime) + '.gif';
-            const file = fs.createWriteStream(photoDirectory + photoName);
-            req.pipe(file);
-
-            // req.on('end', () => {
-            //     file.end();
-            // });
+            const image = req.body;
+            fs.writeFileSync(photoDirectory + photoName, image);
+            // const file = fs.createWriteStream(photoDirectory + photoName);
+            // req.pipe(file);
 
             await Petition.putPhoto(petitionId, photoName);
         } else {

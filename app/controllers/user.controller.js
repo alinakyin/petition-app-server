@@ -238,34 +238,28 @@ exports.setPhoto = async function(req, res){
         if (photoType === 'image/jpeg') {
             let currDateTime = new Date().toString();
             const photoName = 'user_' + id + '_' + Date.parse(currDateTime) + '.jpg';
-            const file = fs.createWriteStream(photoDirectory + photoName);
-            req.pipe(file);
-
-            // req.on('end', () => {
-            //     file.end();
-            // });
+            const image = req.body;
+            fs.writeFileSync(photoDirectory + photoName, image);
+            //const file = fs.createWriteStream(photoDirectory + photoName);
+            //req.pipe(file);
 
             await User.putPhoto(id, photoName);
         } else if (photoType === 'image/png') {
             let currDateTime = new Date().toString();
             const photoName = 'user_' + id + '_' + Date.parse(currDateTime) + '.png';
-            const file = fs.createWriteStream(photoDirectory + photoName);
-            req.pipe(file);
-
-            // req.on('end', () => {
-            //     file.end();
-            // });
+            const image = req.body;
+            fs.writeFileSync(photoDirectory + photoName, image);
+            //const file = fs.createWriteStream(photoDirectory + photoName);
+            //req.pipe(file);
 
             await User.putPhoto(id, photoName);
         } else if (photoType === 'image/gif') {
             let currDateTime = new Date().toString();
             const photoName = 'user_' + id + '_' + Date.parse(currDateTime) + '.gif';
-            const file = fs.createWriteStream(photoDirectory + photoName);
-            req.pipe(file); // pipes the data to the file to store it
-
-            // req.on('end', () => {
-            //     file.end();
-            // });
+            const image = req.body;
+            fs.writeFileSync(photoDirectory + photoName, image);
+            //const file = fs.createWriteStream(photoDirectory + photoName);
+            //req.pipe(file); // pipes the data to the file to store it
 
             await User.putPhoto(id, photoName);
         } else {
@@ -297,14 +291,17 @@ exports.showPhoto = async function(req, res){
                 return res.sendStatus(404);
             } else {
                 const type = photo_filename.split('.')[1];
-                const image = fs.createReadStream(photoDirectory + photo_filename);
+                const image = fs.readFileSync(photoDirectory + photo_filename);
+                //const image = fs.createReadStream(photoDirectory + photo_filename);
 
-                image.pipe(res);
+                //image.pipe(res);
                 res.type(type);
+                res.send(image);
                 return res.status(200);
             }
         }
     } catch (err) {
+        console.log(err);
         return res.sendStatus(500);
     }
 };
