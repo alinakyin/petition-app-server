@@ -236,7 +236,8 @@ exports.setPhoto = async function(req, res){
         // get the binary data from the request body and store the photo in a place it can be retrieved from + update database to set the photo_filename
         const photoType = req.get('Content-Type');
         if (photoType === 'image/jpeg') {
-            const photoName = 'user_' + id + '.jpg';
+            let currDateTime = new Date().toString();
+            const photoName = 'user_' + id + '_' + Date.parse(currDateTime) + '.jpg';
             const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
@@ -246,7 +247,8 @@ exports.setPhoto = async function(req, res){
 
             await User.putPhoto(id, photoName);
         } else if (photoType === 'image/png') {
-            const photoName = 'user_' + id + '.png';
+            let currDateTime = new Date().toString();
+            const photoName = 'user_' + id + '_' + Date.parse(currDateTime) + '.png';
             const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file);
 
@@ -256,7 +258,8 @@ exports.setPhoto = async function(req, res){
 
             await User.putPhoto(id, photoName);
         } else if (photoType === 'image/gif') {
-            const photoName = 'user_' + id + '.gif';
+            let currDateTime = new Date().toString();
+            const photoName = 'user_' + id + '_' + Date.parse(currDateTime) + '.gif';
             const file = fs.createWriteStream(photoDirectory + photoName);
             req.pipe(file); // pipes the data to the file to store it
 
